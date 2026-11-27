@@ -249,6 +249,14 @@ function qualityBootCheck() {
 }
 /* Verrou d'une rangée d'image (septième élément d'une rangée select ou check) : sous l'économie d'énergie, la valeur imposée (gfxSet), sinon null */
 const ecoLock = (k) => () => (Settings.eco ? gfxSet(k) : null);
+/* Mode machine faible (Options, Vidéo) : le raccourci une touche qui pose d'un coup les trois réglages ordinaires du palier le plus léger —
+   qualité Minimale, économie d'énergie et 30 images par seconde au plus. Aucun état propre : être « en mode machine faible » se relit dans ces
+   trois réglages, et en sortir, c'est les changer un par un comme d'habitude. Comme un changement de qualité manuel, qualityReset applique le
+   reste du profil tout de suite et qualityBootCheck propose de relancer (les ombres de Minimale ne changent qu'au lancement). */
+function weakPcApply() {
+  Settings.quality = 'ultra'; Settings.eco = true; Settings.fpsMax = '30'; saveSettings();
+  syncOptions(); qualityReset(); qualityBootCheck();
+}
 const OPT_TABS = [
   [_t('Jeu'), [
     ['head', _t('Écran tactile')], // titre de groupe (mountOptions) : affiché seulement si l'une de ses rangées l'est
@@ -298,6 +306,7 @@ const OPT_TABS = [
     ['head', _t('Image')],
     // économie d'énergie : réglage maître, les rangées d'image dessous sont grisées et montrent ce que le jeu impose (ECO_GFX, CAP, 01-core.js)
     ['check', 'eco', _t('Économie d\u0027énergie (30 images par seconde, le jeu règle l\u0027image selon l\u0027appareil pour que la batterie dure plus longtemps)'), () => ecoApply()],
+    ['button', _t('Mode machine faible'), () => weakPcApply()], // qualité Minimale + économie d'énergie + 30 images par seconde, d'un coup (weakPcApply, plus haut)
     ['select', 'quality', _t('Qualité'), [['auto', _t('Automatique')], ['high', _t('Haute')], ['medium', _t('Moyenne')], ['low', _t('Basse')], ['ultra', _t('Minimale')]], () => { qualityReset(); qualityBootCheck(); }, null, ecoLock('quality')],
     ['check', 'ao', _t('Occlusion ambiante'), () => applyQuality(), null, null, ecoLock('ao')],
     ['check', 'rays', _t('Rayons du soleil'), () => applyQuality(), null, null, ecoLock('rays')],

@@ -33,6 +33,7 @@ Cách chọn ngôn ngữ: Cài đặt trong game (Tùy chọn → Ngôn ngữ �
 | grenade / helicopter / airstrike | lựu đạn / trực thăng / không kích |
 | outfit / challenge | trang phục / thử thách |
 | settings / account / password | cài đặt / tài khoản / mật khẩu |
+| mode machine faible | chế độ máy yếu |
 | recovery code | mã khôi phục |
 | camo | họa tiết ngụy trang |
 | UAV, Drone, Mecha, Killcam | giữ nguyên |
@@ -460,7 +461,70 @@ LOD thấp sớm hơn, ở scale 0,5 gần như không thấy khác; (4) `detail
 neo `QUALITY.ultra` + `updateMapDetail` (`02a-kit.js`), rủi ro pop-in gần; (5) `updateMapDetail` hiện quét
 toàn bộ danh sách fine/scatter mỗi khung — giảm nhịp xuống ~150 ms, rủi ro bằng không.
 
-## 12. Cách build lại
+## 12. Cải thiện cho máy yếu — Phase 3: nút « Chế độ máy yếu » một chạm + lodPx Minimale (2026-11-27)
+
+Theo kế hoạch `KE-HOACH-CAI-THIEN-MAY-YEU.md` (Phase 3, phase cuối của kế hoạch) + 2 đòn bẩy rẻ rút ra từ
+khảo sát ở mục 11C. **Hoàn thành ở local, chưa commit/push.**
+
+### 12.1 Nút « Chế độ máy yếu » trong Options > Vidéo — `src/09e-menus.js`
+
+- Thêm hàm `weakPcApply()` (cạnh `qualityBootCheck`/`ecoLock`) và một hàng nút
+  `['button', _t('Mode machine faible'), () => weakPcApply()]` trong tab Vidéo, ngay dưới hàng Économie
+  d'énergie và trên hàng Qualité. Bấm nút = đặt **một lúc ba cài đặt thường**: `Settings.quality = 'ultra'`
+  (Minimale), `Settings.eco = true` (Tiết kiệm pin), `Settings.fpsMax = '30'`, rồi `saveSettings()` +
+  `syncOptions()` + `qualityReset()` + `qualityBootCheck()` — đúng luồng của một lần đổi chất lượng thủ
+  công: phần áp được ngay thì áp ngay, còn bóng đổ của Minimale (chỉ quyết định lúc khởi động) thì
+  `qualityBootCheck` sẵn có sẽ hỏi « Bóng đổ sẽ thay đổi vào lần khởi chạy game tiếp theo. Khởi động lại
+  ngay bây giờ? » và tải lại trang nếu đồng ý (ở trong phòng chờ/trong trận thì im lặng như đổi tay thường,
+  cài đặt đã lưu sẽ trọn vẹn ở lần mở game sau).
+- **Không tạo trạng thái/cờ ẩn nào**: « đang ở chế độ máy yếu » đọc lại được từ chính ba cài đặt trên; thoát
+  chế độ = người dùng tự đổi tay từng mục như bình thường (đã kiểm chứng: đặt lại quality 'auto' + tắt eco +
+  fpsMax '0' thì `gfxSet('quality')` về 'auto', trần FPS về 0, không kẹt trạng thái preset nào).
+- **i18n:** 1 khóa mới « Mode machine faible » → en « Weak PC mode », vi « **Chế độ máy yếu** » (thêm vào
+  section `09e-menus.js` của cả hai từ điển + một dòng trong bảng thuật ngữ mục 2). Từ điển **1.619/1.619**,
+  `check_i18n.py` **0 lỗi**, `python3 build.py` sạch.
+
+### 12.2 lodPx của tier Minimale: 260 → 320 — `src/01-core.js`
+
+- Đòn bẩy (3) của khảo sát mục 11C, nhưng chọn **320 thay vì ~400** như khảo sát gợi ý. `lodPx` là chiều cao
+  hiển thị (px) của một lính 1,8 m mà trên đó game dùng model chi tiết (`updateSoldierLods`, `06c-models.js`;
+  vật nhặt cũng dùng chung ngưỡng, `08c-pickups.js`): ở màn 1080p, 260 ≈ model chi tiết trong vòng ~6,2 m,
+  320 ≈ ~5 m, 400 ≈ ~4 m — ở 4 m lính chiếm hơn 1/3 chiều cao màn hình, đổi sang model nhẹ ở khoảng đó rủi
+  ro thấy rõ khi cận chiến. 320 là điểm cân bằng: lính ở 5–6,2 m (vốn đã render ở scale ≤ 0,75 rồi phóng lên
+  ở Minimale) chuyển model nhẹ sớm hơn, còn cận chiến dưới 5 m giữ nguyên model chi tiết. Hysteresis 0,85 sẵn
+  có chống nhấp nháy qua lại. Đã rà: không nơi nào khác ghi đè `lodPx` (chỉ `QUALITY` định nghĩa, hai nơi
+  trên đọc `RQ.q.lodPx`).
+
+### 12.3 Đòn bẩy (1) của khảo sát — tắt shadow pass khi thang tự động tụt xuống Minimale: **KHÔNG LÀM, có lý do kỹ thuật**
+
+- Khảo sát mục 11C gợi ý tắt shadow pass tại thời điểm `stepQuality` chạm rung ultra để tiết kiệm gần một
+  lần vẽ toàn cảnh (đúng kịch bản máy tester UHD 730). Rà soát cơ chế cho thấy **không tắt an toàn được lúc
+  chạy**: `SHADOWS`/`NO_SHADOWS`/`ULTRA` là hằng quyết định **một lần lúc khởi động** (`src/01-core.js`,
+  khối ngay trước `QUALITY` — comment trong code ghi rõ phần này « ne se change qu'en recompilant tous les
+  shaders »). Cụ thể: (a) mã shader của vật liệu được **dệt sẵn theo `NO_SHADOWS`** — đường « bóng mặt trời
+  nướng sẵn » (nhân `vol.a` của `02e-light.js` vào ánh sáng) chỉ được chèn vào shader khi boot không bóng
+  (`src/02c-materials.js`), còn boot có bóng thì vật liệu mang sẵn chunk CSM (`csmSetup`) và đèn mặt trời đã
+  gộp theo cascade (`src/01-core.js`); (b) cỏ cũng đặt define `GR_SH` theo `!NO_SHADOWS` (`02nb-gazon.js`).
+  Nếu chỉ ngừng vẽ shadow map giữa trận (`csmDepthMaps`), shader đã biên dịch vẫn lấy mẫu các map đó → bóng
+  đóng băng/sai, mà đường bóng nướng sẵn lại **không tồn tại** trong shader đang chạy → hình sai lệch hơn cả
+  boot Minimale thật, tức « vỡ hình » theo đúng nghĩa cần tránh.
+- Cách tắt an toàn duy nhất là **khởi động lại ở trạng thái Minimale** — và game đã có sẵn đường đó:
+  `qualityBootCheck` đề nghị relancer khi người dùng tự chọn Minimale (nay cũng là đường của nút Chế độ máy
+  yếu, mục 12.1). Vì vậy mục này đóng lại ở đây; muốn hưởng trọn tiết kiệm shadow pass, người chơi bấm nút
+  Chế độ máy yếu (hoặc chọn Minimale) và đồng ý khởi động lại một lần.
+
+### 12.4 Kiểm chứng Phase 3 (headless Chromium, bản build local, SwiftShader)
+
+Script `phase3-test.js` (test-rig), hồ sơ seed `dc_settings` {quality 'medium', lang 'vi', sv 8} để boot
+chưa phải ULTRA: **9/9 PASS** — boot ở tier medium, `NO_SHADOWS=false`; tab Vidéo có nút « Chế độ máy yếu »;
+bấm nút → ba cài đặt đổi đúng và **đã lưu vào `dc_settings`**; hộp thoại đề nghị khởi động lại của
+`qualityBootCheck` hiện đúng 1 lần (chuỗi sẵn có); sau khi tải lại: `ULTRA=true`, tier ultra,
+`NO_SHADOWS=true` (bóng nướng sẵn — đúng đường boot Minimale), `RQ.q.lodPx = 320`; đổi tay về
+auto/eco tắt/fpsMax '0' hoạt động như gốc; không lỗi JS của game. (Hai vòng chạy đầu hỏng vì lỗi của chính
+harness: seed thiếu `sv` nên game ép quality về 'auto' như settings đời cũ, và init script ghi đè
+`dc_settings` sau mỗi lần tải trang — đã sửa harness, không liên quan code game.)
+
+## 13. Cách build lại
 
 ```bash
 python3 build.py   # sinh dist/riposte-frontline.html, đã nhúng cả I18N_EN và I18N_VI

@@ -410,6 +410,7 @@ Invitation au salon {0}. Connexion dès la fin du chargement. ⇒ Invitation to 
 relais injoignable ⇒ relay unreachable
 
 # 09e-menus.js
+Mode machine faible ⇒ Weak PC mode
 Séries ⇒ Killstreaks
 Selon la classe ⇒ Class default
 En solo, toutes les armes sont débloquées. ⇒ In solo, all weapons are unlocked.

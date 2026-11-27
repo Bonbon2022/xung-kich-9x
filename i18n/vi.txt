@@ -408,6 +408,7 @@ Invitation au salon {0}. Connexion dès la fin du chargement. ⇒ Lời mời v�
 # 09d-netrelay.js
 relais injoignable ⇒ không kết nối được máy chủ chuyển tiếp
 # 09e-menus.js
+Mode machine faible ⇒ Chế độ máy yếu
 Séries ⇒ Chuỗi hạ gục
 Selon la classe ⇒ Theo lớp nhân vật
 En solo, toutes les armes sont débloquées. ⇒ Ở chế độ solo, mọi súng đều được mở khóa.

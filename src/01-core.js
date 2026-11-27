@@ -316,7 +316,7 @@ const QUALITY = {
   // pour les machines trop faibles pour Basse (Intel HD 3000, vieux téléphones) : en plus de Basse, sans éclairs de tir ni gazon, menus détails et
   // dispersion au sol plus proches, modèle détaillé des soldats de plus près, plancher de résolution plus bas ; lancé ainsi, sans ombres calculées
   // (le soleil garde son ombre, cuite dans l'éclairage), sans pré-passe, textures au tiers (ULTRA)
-  ultra: { label: _t('Minimale'), pr: GFX_SAFE ? 0.6 : 0.75, scaleMin: 0.5, msaa: 0, shadow: 512, bloom: false, rays: false, lights: 0, lodPx: 260, detail: 24, scatter: 14, pom: [0, 0, 1, 0], grass: null, lean: true },
+  ultra: { label: _t('Minimale'), pr: GFX_SAFE ? 0.6 : 0.75, scaleMin: 0.5, msaa: 0, shadow: 512, bloom: false, rays: false, lights: 0, lodPx: 320, detail: 24, scatter: 14, pom: [0, 0, 1, 0], grass: null, lean: true },
 };
 /* Échelle du mode automatique, du plus beau au plus léger : [profil, plus petit et plus grand facteur de résolution].
    On renonce d'abord à ce qui se voit le moins (anticrénelage 4x puis 2x) ; la résolution ne descend qu'ensuite, par
