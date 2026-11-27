@@ -11,6 +11,15 @@
   ],
   "headers": [
     {
+      "source": "/riposte-frontline.html",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'self' https://san-choi-9x.vercel.app http://localhost:2567"
+        }
+      ]
+    },
+    {
       "source": "/sw.js",
       "headers": [
         {

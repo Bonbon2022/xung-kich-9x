@@ -1408,7 +1408,36 @@ function netRender(o = {}) {
   if (host) { start.textContent = NET.phase === 'loading' ? _t('Chargement de la partie...') : _t('Lancer la partie'); start.disabled = !NET.joined || NET.phase !== 'lobby'; }
   else { start.textContent = NET.phase !== 'lobby' ? _t('Rejoindre la partie') : _t('En attente de l\u0027hôte'); start.disabled = NET.phase === 'lobby' || NET.on || !NET.joined || !!UI.flow; }
 }
+/* ---------- Cầu nối Sân Chơi 9X (XK9X) ----------
+   Sân Chơi 9X (https://san-choi-9x.vercel.app) nhúng game này trong một iframe và cấp sẵn nick + mã phòng
+   qua URL : ?xk9x=1&nick=<nick>&creer=<MÃ> (vai chủ phòng) hoặc &salon=<MÃ> (vai khách, cơ chế sẵn có),
+   kèm &xk9x_origin=<origin của trang cha>. Khi cầu nối bật, game báo về trang cha bằng postMessage
+   (chỉ tới đúng origin đã khai báo, không bao giờ '*') :
+   { src: 'xk9x', ev: 'ready' | 'hosted' | 'joined' | 'left', code }.
+   Không có xk9x=1 thì toàn bộ khối này im lặng và game chạy như bình thường. Chi tiết : TICH-HOP.md. */
+const XK9X_Q = new URLSearchParams(location.search);
+const XK9X_ON = XK9X_Q.get('xk9x') === '1';
+const XK9X_ORIGIN = XK9X_Q.get('xk9x_origin') || '';
+function xk9xPost(ev) {
+  if (!XK9X_ON || !XK9X_ORIGIN || window.parent === window) return;
+  try { window.parent.postMessage({ src: 'xk9x', ev, code: NET.code || '' }, XK9X_ORIGIN); } catch (e) { /* origin invalide : on se tait */ }
+}
+/* Nick do Sân Chơi cấp : ghi đè cod_nick trước khi netInit đọc nó vào NET.nick (làm sạch bằng netClean như thường lệ) */
+function xk9xApplyNick() {
+  if (!XK9X_ON) return;
+  const n = XK9X_Q.get('nick');
+  if (!n) return;
+  try { localStorage.setItem('cod_nick', netClean(n)); } catch (e) { /* stockage indisponible */ }
+}
+/* Theo dõi NET.joined (kiểm tra nhẹ mỗi 500 ms) : báo 'hosted' (chủ phòng) hoặc 'joined' (khách), một lần mỗi lần chuyển trạng thái */
+let xk9xJoinedPrev = false;
+function xk9xWatch() {
+  const j = !!NET.joined;
+  if (j && !xk9xJoinedPrev) xk9xPost(NET.role === 'host' ? 'hosted' : 'joined');
+  xk9xJoinedPrev = j;
+}
 function netInit() {
+  xk9xApplyNick(); // Cầu nối Sân Chơi 9X : nick cấp qua URL phải được ghi vào cod_nick trước dòng đọc ngay dưới
   try { NET.nick = netClean(localStorage.getItem('cod_nick') || '').replace(/^Soldat$/, ''); } catch (e) { NET.nick = ''; }
   $('netName').value = NET.nick;
   try { NETP.vis = localStorage.getItem('cod_salon_pub') === '1' ? 1 : 0; } catch (e) { NETP.vis = 0; }
@@ -1432,6 +1461,8 @@ function netInit() {
   addEventListener('pageshow', () => { NET.leaving = false; });
   addEventListener('pagehide', () => { NET.leaving = true; if (NET.peer) { try { NET.peer.destroy(); } catch (e) { /* déjà détruit */ } } if (NET.relay) NET.relay.close(); if (NET.relayConn) NET.relayConn.close(); });
   netRender();
+  xk9xPost('ready'); // Cầu nối Sân Chơi 9X : báo trang cha là game đã khởi tạo xong phần mạng
+  if (XK9X_ON) { setInterval(xk9xWatch, 500); addEventListener('pagehide', () => xk9xPost('left')); }
   if (!netCan()) {
     netStatus(_t('Mode en ligne indisponible. La bibliothèque réseau n\u0027a pas pu être chargée. Rechargez la page.'));
     return;
@@ -1444,4 +1475,8 @@ function netInit() {
 function netAutoJoin() {
   const code = new URLSearchParams(location.search).get('salon') || pwaSalon(); // ou l'invitation reçue dans le navigateur, ouverte ici dans l'application (09r-pwa.js)
   if (code && netCan() && NET.role === 'off') acctWhenReady(() => { if (NET.role === 'off') { netJoinCode(code); if (acctOnlineOk()) uiGo('multi'); } });
+  else if (XK9X_ON) { // Cầu nối Sân Chơi 9X : làm chủ phòng theo mã Sân Chơi chỉ định sẵn (param creer) ; có salon thì nhánh trên đã ưu tiên như cũ
+    const creer = (XK9X_Q.get('creer') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5);
+    if (creer.length === 5 && netCan() && NET.role === 'off') acctWhenReady(() => { if (NET.role === 'off') { netHost({ code: creer }); if (acctOnlineOk()) uiGo('multi'); } });
+  }
 }

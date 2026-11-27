@@ -181,7 +181,33 @@ Dựng bằng Python PIL, font **Saira Stencil One** (TTF tải từ google/font
   6.1) — nếu sau này muốn sạch tuyệt đối ở cả chế độ Pháp thì phải đổi khóa Pháp đồng bộ cả hai từ điển như đã
   làm với khóa tiêu đề.
 
-## 7. Cách build lại
+## 7. Cầu nối tích hợp Sân Chơi 9X — T1 (2026-11-27)
+
+Sân Chơi 9X (https://san-choi-9x.vercel.app) nhúng game trong iframe và cấp sẵn nick + mã phòng qua
+URL. Giao ước đầy đủ nằm ở **`TICH-HOP.md`** (file riêng ở gốc repo, là tài liệu hai phía cùng theo).
+Tóm tắt phần đã làm ở phía game, **hoàn thành ở local, chưa commit/push**:
+
+- `src/09c-net.js`: thêm một khối « Cầu nối Sân Chơi 9X (XK9X) » ngay trước `netInit()` (hằng
+  `XK9X_Q`/`XK9X_ON`/`XK9X_ORIGIN`, hàm `xk9xPost`, `xk9xApplyNick`, `xk9xWatch`) và ba điểm chạm tối
+  thiểu: `netInit()` gọi `xk9xApplyNick()` trước chỗ đọc `cod_nick` (nick qua URL ghi đè `cod_nick`
+  sau khi qua `netClean`), gửi sự kiện `ready` + chạy interval 500 ms theo dõi `NET.joined` +
+  `pagehide` gửi `left`; `netAutoJoin()` thêm nhánh `creer` (host theo mã Sân Chơi chỉ định bằng
+  `netHost({ code })`, đúng mẫu `acctWhenReady` của nhánh `salon`; có `salon` thì `salon` vẫn ưu tiên).
+  Sự kiện gửi về cha qua `postMessage` tới đúng `xk9x_origin` (không bao giờ `'*'`):
+  `{ src: 'xk9x', ev: 'ready' | 'hosted' | 'joined' | 'left', code }`.
+- `vercel.json`: thêm header cho `/riposte-frontline.html` —
+  `Content-Security-Policy: frame-ancestors 'self' https://san-choi-9x.vercel.app http://localhost:2567`
+  (localhost:2567 là cổng dev của Sân Chơi). Các cấu hình khác giữ nguyên, kể cả `buildCommand` có
+  `tools/restore_assets.py`.
+- Kiểm chứng: `python3 build.py` sạch, `check_i18n.py` 0 lỗi, dist chứa đủ mã cầu nối. Headless
+  Chromium với trang cha khác origin nhúng iframe `?xk9x=1&nick=ChienSi9X&creer=AB3CD&xk9x_origin=…`:
+  cha nhận `ready` rồi `hosted` (`code 'AB3CD'`); trong iframe `cod_nick` và `NET.nick` đều là
+  `ChienSi9X`, `NET.role === 'host'`, `NET.code === 'AB3CD'`, `NET.joined === true`. Hạn chế môi
+  trường: máy ảo không ra được Internet nên PeerJS trên CDN không tải được — bước host được kiểm
+  chứng bằng `Peer` giả lập tiêm vào trang (chứng minh vá gọi đúng `netHost` với mã chỉ định và phát
+  sự kiện); kết nối PeerJS cloud thật cần kiểm chứng lại trên bản deploy.
+
+## 8. Cách build lại
 
 ```bash
 python3 build.py   # sinh dist/riposte-frontline.html, đã nhúng cả I18N_EN và I18N_VI
