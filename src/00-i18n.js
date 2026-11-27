@@ -26,6 +26,13 @@ const LANG = (() => {
   for (const x of l) { const c = String(x || '').slice(0, 2).toLowerCase(); if (c === 'fr' || c === 'en' || c === 'vi') return c; }
   return 'vi'; // fork vietnamien : à défaut d'une langue reconnue, le vietnamien prime (et non l'anglais comme en amont)
 })();
+/* Công tắc mở khóa súng tạm thời (đợt trải nghiệm, cầu nối Sân Chơi) : ?unlockall=1|0 lu dès ici, avant Settings
+   (01-core.js) et avant tout appel à weaponLock (06r-arsenal.js). true/false si le paramètre est présent, null sinon
+   (on garde alors la valeur enregistrée dans les réglages). 01-core.js l'applique et l'enregistre. */
+const UNLOCKALL_URL = (() => {
+  try { const v = new URLSearchParams(location.search).get('unlockall'); if (v === '1') return true; if (v === '0') return false; } catch (e) { /* ignoré */ }
+  return null;
+})();
 const LOCALE = LANG === 'fr' ? 'fr-FR' : LANG === 'vi' ? 'vi-VN' : 'en-US';
 const PCT = LANG === 'fr' ? ' %' : '%'; // « 10 % » en français, « 10% » en anglais et en vietnamien
 const I18N_DICT = LANG === 'vi' ? I18N_VI : I18N_EN; // dictionnaire actif (le français n'en a pas : les clés sont en français)

@@ -43,7 +43,7 @@ function deckLooksLike() {
 /* Écran tactile comme pointeur principal (téléphone, tablette) : contrôles tactiles (09q-tactile.js) et profil graphique de départ allégé */
 const COARSE = !DECK && typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches && (navigator.maxTouchPoints || 0) > 0;
 const VIEW = { w: innerWidth, h: innerHeight, set: false }; // taille de la vue 3D (viewSync)
-const Settings = { binds: {}, touch: 'auto', tcRun: 'stick', tcStick: 'float', tcLay: null, aimAssist: 'normal', tpMode: 'auto', tpSeen: false, tpHint: false, tpAuto: true, tpDblAds: true, adsToggle: false, tcAuto: true, tcDblAds: true, tcQuick: true, tcVib: true, tcAlpha: '1', tcV: 0, gfxSafe: false, gfxSafeAuto: '', padSeen: false, padSens: 1.0, padAdsMul: 0.65, adsMul: 1.0, padDead: 0.1, padCurve: 'reactive', padAccel: 'normal', padRun: 'click', padLay: 'default', padVib: true, sens: 1.0, fov: 62, quality: 'auto', dynres: true, eco: null, fpsMax: '0', perf: false, ao: false, rays: true, grass: true, difficulty: 2, loadout: 0, soloGun: null, mode: 'tdm', limit: 75, limitFfa: 20, limitDom: 150, minutes: 10, map: 'sable', volume: 0.8, music: 0.5, voice: true, nadeArc: true, invertY: false, fsGame: false, allyMarks: true, hudScale: '1', skin: 'assault', lang: 'auto', sv: 8 };
+const Settings = { binds: {}, touch: 'auto', tcRun: 'stick', tcStick: 'float', tcLay: null, aimAssist: 'normal', tpMode: 'auto', tpSeen: false, tpHint: false, tpAuto: true, tpDblAds: true, adsToggle: false, tcAuto: true, tcDblAds: true, tcQuick: true, tcVib: true, tcAlpha: '1', tcV: 0, gfxSafe: false, gfxSafeAuto: '', padSeen: false, padSens: 1.0, padAdsMul: 0.65, adsMul: 1.0, padDead: 0.1, padCurve: 'reactive', padAccel: 'normal', padRun: 'click', padLay: 'default', padVib: true, sens: 1.0, fov: 62, quality: 'auto', dynres: true, eco: null, fpsMax: '0', perf: false, ao: false, rays: true, grass: true, difficulty: 2, loadout: 0, soloGun: null, unlockAll: false, mode: 'tdm', limit: 75, limitFfa: 20, limitDom: 150, minutes: 10, map: 'sable', volume: 0.8, music: 0.5, voice: true, nadeArc: true, invertY: false, fsGame: false, allyMarks: true, hudScale: '1', skin: 'assault', lang: 'auto', sv: 8 };
 try {
   const s = JSON.parse(localStorage.getItem('dc_settings') || 'null');
   // réglages d'avant la version 2 : la qualité « Haute » y était la valeur par défaut, on passe en automatique
@@ -63,6 +63,11 @@ try {
   }
   if (Settings.aimAssist !== 'off') Settings.aimAssist = 'normal';
 } catch (e) { /* stockage indisponible */ }
+/* Công tắc mở khóa toàn bộ súng (tạm thời, cho đợt trải nghiệm) : le paramètre ?unlockall=1|0 lu dans 00-i18n.js
+   (UNLOCKALL_URL) prime et s'enregistre ici — les visites suivantes, même sans paramètre et même hors cầu nối,
+   gardent l'état jusqu'à un ?unlockall=0. Effet : weaponLock (06r-arsenal.js) ne verrouille plus aucune arme.
+   Les verrous hors armes (emplacements de classes personnalisées, séries) ne sont pas concernés. */
+if (UNLOCKALL_URL !== null && Settings.unlockAll !== UNLOCKALL_URL) { Settings.unlockAll = UNLOCKALL_URL; saveSettings(); }
 /* Économie d'énergie (CAP, plus bas) : jamais choisie, elle part activée au doigt (téléphone, tablette) et le jeu demande une fois s'il faut la garder
    (ecoAsk, 09zl-economie.js) ; ailleurs, désactivée sans question */
 if (Settings.eco !== true && Settings.eco !== false) { Settings.eco = COARSE; Settings.ecoAsk = COARSE; }

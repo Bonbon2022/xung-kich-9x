@@ -51,6 +51,7 @@ const wLevel = (id) => wLevelInfo(id).level;
 const PREVIEW_HOST = /^playriposte-dev\.|-git-dev-/.test(location.hostname), PREVIEW_CAMOS = { ump45: ['holo'] };
 /* Raison pour laquelle une arme est verrouillée ('' si disponible ; sur la préversion, une arme qui y a un camouflage offert l'est) */
 function weaponLock(id) {
+  if (Settings.unlockAll) return ''; // công tắc trải nghiệm (?unlockall=1, voir 01-core.js) : toutes les armes sont ouvertes, en ligne comme en solo
   const u = WEAPONS[id].unlock; if (!u || (PREVIEW_HOST && PREVIEW_CAMOS[id])) return '';
   const lv = wLevel(u.from);
   return lv >= u.level ? '' : `${_t('Montez le {0} au niveau {1} (niveau {2})', WEAPONS[u.from].name, u.level, lv)}`;

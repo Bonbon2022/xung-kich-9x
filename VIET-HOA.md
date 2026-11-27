@@ -248,6 +248,21 @@ Theo yêu cầu người chơi (duyệt bởi user): ở màn Solo, chọn trự
   solo chơi thật từ đầu tới cuối trong máy ảo (nặng), nhưng `giveLoadout()` là đúng hàm mà luồng vào
   trận/hồi sinh gọi.
 
+### 8.1 Công tắc mở khóa súng online tạm thời — `?unlockall=` (2026-11-27)
+
+- **Mục đích:** mở toàn bộ súng cả khi chơi **online** cho đợt người dùng trải nghiệm, có tham số bật/tắt
+  để tắt sau này mà không sửa logic.
+- **Bật:** mở game kèm `?unlockall=1` (Sân Chơi 9X tự thêm tham số này vào URL iframe mở game).
+  **Tắt:** mở game kèm `?unlockall=0` một lần, hoặc xóa `dc_settings` trong localStorage của trình duyệt.
+- **Cơ chế:** `src/00-i18n.js` đọc tham số rất sớm thành hằng `UNLOCKALL_URL` (true/false/null);
+  `src/01-core.js` áp dụng vào `Settings.unlockAll` (mặc định `false`) ngay sau khi nạp `dc_settings`
+  và **lưu lại** qua `saveSettings()` — các lần vào sau, kể cả vào thẳng không qua link có tham số, vẫn
+  giữ trạng thái cho tới khi nhận `unlockall=0`. `weaponLock()` trong `src/06r-arsenal.js` trả về
+  « không khóa » cho mọi súng khi công tắc bật, nên kho vũ khí, màn sửa lớp và kiểm tra trang bị đều mở
+  hết theo cùng một cổng duy nhất.
+- **Không đụng:** khóa ô lớp tùy biến theo cấp người chơi (`CUSTOM_UNLOCK`), khóa phụ kiện/camo theo
+  cấp súng, và hành vi `soloGun` (solo vẫn luôn mở toàn bộ như mục 8).
+
 ## 9. Cách build lại
 
 ```bash
