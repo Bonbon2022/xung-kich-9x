@@ -764,6 +764,8 @@ function hostBgTick() {
 }
 /* ---------- Boucle ---------- */
 let lastT = performance.now(), frameN = 0;
+/* Aperçus 3D des menus sur puce faible : temps accumulé entre deux rendus et compteur d'images (voir frame) */
+let menuAcc = 0, menuN = 0;
 function frame(now) {
   requestAnimationFrame(frame);
   if (GPUX.halt) return; // contexte WebGL perdu en partie : plus rien à dessiner, la fenêtre « Affichage 3D interrompu » propose de relancer (01a-gpu.js)
@@ -779,7 +781,22 @@ function frame(now) {
   musicTick(dt); sfxTick(dt);
   CAMO_U.uCamoT.value = now / 1000; CAMO_U.uHoloFx.value = RQ.q.lean ? 0 : 1; // le Holo dérive aussi dans la vitrine de l'atelier ; ses paillettes, pas en qualité Basse (06q-camos.js)
   const aerial = MATCH.state === 'menu' && UI.screen === 'deploy';
-  if (MATCH.state === 'menu' && !aerial) { menuBgShow(true); if (UI.screen === 'arsenal' && ARSUI.tab !== 'k') vwTick(dt); else if (UI.screen === 'skins') skinTick(); const drew = mbgDraw(dt); if (UI.screen === 'skins') skinLive(drew, dt); return; } // l'atelier de classe dessine l'arme dans son cadre (09o-vitrine.js), puis le fond animé (09w-fond.js), et par-dessus, l'écran Tenues son soldat animé (09u-tenues.js)
+  if (MATCH.state === 'menu' && !aerial) { // l'atelier de classe dessine l'arme dans son cadre (09o-vitrine.js), puis le fond animé (09w-fond.js), et par-dessus, l'écran Tenues son soldat animé (09u-tenues.js)
+    menuBgShow(true);
+    // puces faibles : les aperçus 3D (atelier, tenues) ne rendent qu'une image sur deux ; le temps de l'image sautée est
+    // accumulé et rendu au rendu suivant (la pose de l'aperçu animé cumule déjà son temps, rien ne se perd) ; le fond
+    // animé, bon marché, garde chaque image
+    menuAcc = Math.min(menuAcc + dt, 0.1);
+    const half = GPU_LOW && (menuN++ & 1) === 1;
+    if (!half) {
+      if (UI.screen === 'arsenal' && ARSUI.tab !== 'k') vwTick(menuAcc);
+      else if (UI.screen === 'skins') skinTick();
+    }
+    const drew = mbgDraw(dt);
+    if (UI.screen === 'skins' && !half) skinLive(drew, menuAcc);
+    if (!half) menuAcc = 0;
+    return;
+  }
   menuBgShow(false);
   renderer.info.reset();
   if (PFR.on) { PFR.inFrame = true; PFR.lt = performance.now(); } // enregistreur de performances (09zo-perfs.js)
@@ -824,9 +841,15 @@ function frame(now) {
   allyMarksUpdate(); // marqueurs d'alliés (09m-marqueurs.js) : la caméra est définitive
   updateSoldierLods(); clothUpdate(dt); updateMapDetail(); grassUpdate(now / 1000); // clothUpdate : tissus des soldats (06gb-tissu.js), après le choix des modèles détaillés
   pfrLap(4); updateShadows(); pfrLap(5);
+  // vue aérienne du choix de la classe sur puce faible : rendue à échelle 0,6 le temps de l'image seulement, l'échelle
+  // dynamique est restaurée juste après — rien n'est recréé (sous-rectangle RS, voir applyScale) et updateDynRes,
+  // appelé en fin d'image, continue de juger l'échelle réelle
+  const airScale = aerial && GPU_LOW && gfxSet('dynres') !== false && RQ.scale > 0.6 ? RQ.scale : 0;
+  if (airScale) { RQ.scale = 0.6; applyScale(); }
   if (GPUT) GPUT.begin();
   renderFrame(dt); pfrLap(6);
   if (GPUT) GPUT.end();
+  if (airScale) { RQ.scale = airScale; applyScale(); }
   lagMark();
   gpuFrame(now);
   updateDynRes(now, interval, performance.now() - t0);

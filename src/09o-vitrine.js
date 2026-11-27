@@ -134,7 +134,10 @@ function thumbsWant(key) {
    de contexte d'un Pixel au README) : les armes des classes passent en tête de file (thumbsStart), prêtes avant qu'on lance une partie */
 // (UI.screen reste « deploy » pendant toute la partie : seul l'état de la partie dit si l'on est au choix de la classe d'avant le déploiement)
 const thumbsDeploy = () => MATCH.state === 'menu' && UI.screen === 'deploy';
-const thumbsAllowed = () => !UI.busy && MAPL.state !== 'loading' && (MATCH.state === 'paused' || (MATCH.state === 'menu' && (!thumbsDeploy() || !COARSE)));
+/* Puces faibles (GPU_LOW, 01-core.js) : la file ne travaille qu'aux menus hors vue aérienne — ni pendant la pause d'une
+   partie (les cartes y montrent l'arme nue estompée, le repli prévu), ni pendant la vue aérienne, déjà le rendu le plus
+   lourd hors partie ; et aux menus elle avance espacée (voir thumbsStep), le temps que les cartes montrent l'arme nue. */
+const thumbsAllowed = () => !UI.busy && MAPL.state !== 'loading' && (MATCH.state === 'paused' || (MATCH.state === 'menu' && (!thumbsDeploy() || !COARSE))) && (!GPU_LOW || (MATCH.state === 'menu' && !thumbsDeploy()));
 /* Lance (ou reprend) la construction des vignettes manquantes, une par tâche, tant qu'aucune partie ne se prépare : les armes des classes
    d'abord (montées, puis nues : ce que montre le choix de la classe), les autres armes, puis les tenues (les plus longues à dessiner ;
    l'écran Tenues fait passer devant celles qu'il montre) */
@@ -162,7 +165,7 @@ function thumbsStep() {
   }
   const src = VTHUMB.img[id] || (skin ? skinThumbRender(id.slice(5)) : thumbRender(id));
   if (src) for (const el of document.querySelectorAll(`img[data-thumb="${id}"]`)) { el.src = src; el.removeAttribute('data-pend'); }
-  setTimeout(thumbsStep, dep ? 330 : MATCH.state === 'paused' ? 260 : 40); // pause en partie, choix de la classe : une vignette par quart ou tiers de seconde
+  setTimeout(thumbsStep, dep ? 330 : MATCH.state === 'paused' ? 260 : GPU_LOW ? 300 : 40); // pause en partie, choix de la classe : une vignette par quart ou tiers de seconde ; puces faibles aux menus : une par tiers de seconde aussi, la file ne sature pas la boucle
 }
 
 /* ---------- Visuel de l'atelier ---------- */

@@ -314,7 +314,60 @@ commit/push.**
   Trường hợp hiếm: người dùng đã tự bật/tắt eco trong Options trước khi từng thấy hộp thoại vẫn có thể bị
   hỏi một lần — chấp nhận được.
 
-## 10. Cách build lại
+## 10. Cải thiện cho máy yếu — Phase 2: thích ứng trong trận sớm hơn, không bị chặn oan + giảm render 3D ngoài trận (2026-11-27)
+
+Theo kế hoạch `KE-HOACH-CAI-THIEN-MAY-YEU.md` (Phase 2), nối tiếp mục 9. **Hoàn thành ở local, chưa
+commit/push.** Không thêm chuỗi i18n nào (`check_i18n.py` 0 lỗi, 1.618/1.618; `python3 build.py` sạch).
+
+- **Hằng dùng chung `GPU_LOW`** (`src/01-core.js`, ngay sau `GPU_IGPU`): `GPU_SOFT || GPU_WEAK || GPU_IGPU` —
+  nhóm máy áp dụng mọi thích ứng « máy yếu » của phase này.
+- **2.1 Hạ scale cả khi nghẽn hỗn hợp (`src/01-core.js`, `updateDynRes` + hàm mới `dynScaleDown`):** trước đây
+  điều kiện `gpuBound` chặn mọi lần hạ khi nút thắt không thuần GPU — đúng ca máy CPU yếu + iGPU dùng chung, hoặc
+  trình duyệt không có `EXT_disjoint_timer_query_webgl2` (không đo được thời gian GPU). Nay chia 2 nấc: khi
+  `gpuBound` (hoặc scale > 1) vẫn đi `stepQuality` như cũ — chỉ đường này mới được tụt bậc thang/đổi profile
+  (việc phải tạo lại render target vẫn giữ điều kiện chặt); khi không `gpuBound` mà FPS thấp bền vững qua **2 cửa
+  sổ đo liên tiếp**, `dynScaleDown(step)` hạ **chỉ độ phân giải** trong sàn của profile/bậc hiện tại (cùng sàn và
+  cùng quy tắc đóng băng GFX_SAFE như `stepQuality`), không bao giờ đổi profile. **Hysteresis:** `DYN.lastDown`
+  ghi thời điểm hạ gần nhất; nhánh tăng (`roomy`) bị khóa 10 giây sau mỗi lần hạ (`DYN.good` bị xóa về 0), hết
+  dao động mờ–nét; logic tăng khi máy khỏe không đổi ngoài khóa này.
+- **2.2 Thích ứng nhanh đầu trận cho máy yếu (`updateDynRes`, `dynDown`):** thời gian miễn trừ đầu đợt render
+  liên tục (`GPUF.t0`) rút từ 5 giây xuống **2 giây** chỉ khi `GPU_LOW` (GPU rời giữ 5 giây — lý do miễn trừ là
+  compile shader muộn, máy yếu trả giá mỗi giây full-res đắt hơn). Bước hạ đầu tiên của máy yếu khi frame rất
+  chậm (`med > budget × 1,6`) và scale còn cao (0,9–1,2): `dynDown` nhảy thẳng về **0,80** thay vì gặm 5%/cửa sổ;
+  các bước sau theo nhịp cũ.
+- **2.3 Giảm render 3D ngoài trận trên máy yếu:**
+  - *Vue aérienne* (màn chọn lớp trước trận, `src/09-game.js` trong `frame()`): khi `GPU_LOW` và dynres bật,
+    frame được render ở **scale 0,6** — kẹp tạm `RQ.scale` + `applyScale()` ngay trước `renderFrame()` và khôi
+    phục ngay sau, trong cùng frame: chỉ đổi phần vẽ của render target (RS), không tạo lại gì, và
+    `updateDynRes` ở cuối frame vẫn phán xét trên scale thật.
+  - *Thumbnail 3D* (`src/09o-vitrine.js`): `thumbsAllowed()` thêm điều kiện — trên `GPU_LOW`, hàng đợi chỉ làm
+    việc ở menu thường: **không** render trong pause của trận (thẻ lớp hiện ảnh súng trần mờ — đúng fallback
+    thiết kế sẵn) và **không** render ở vue aérienne; nhịp ở menu giãn từ 40 ms xuống **300 ms**/thumbnail
+    (`thumbsStep`). Ảnh súng trần vẫn là fallback như cũ qua `weaponThumbKey`.
+  - *Preview 3D ở menu* (`src/09-game.js`, nhánh menu của `frame()`): trên `GPU_LOW`, `vwTick` (kho vũ khí) và
+    `skinTick`/`skinLive` (trang phục) chỉ render **1 frame trên 2**; thời gian của frame bị bỏ được cộng dồn
+    (`menuAcc`, trần 0,1 s) và trả cho lần render sau — pose của preview hoạt hình vốn tích lũy thời gian nên
+    không mất nhịp. Nền menu hoạt hình giữ nguyên mọi frame.
+- **Kiểm chứng (headless Chromium, bản build local, hồ sơ sạch SwiftShader → `GPU_SOFT`/`GPU_LOW` thật, tier
+  ultra):** build sạch + i18n 0 lỗi; không lỗi JS từ code game. Lái trực tiếp hàm thật `updateDynRes` bằng
+  tham số tổng hợp (interval 50 ms, CPU 40 ms = nghẽn CPU, stub thời gian GPU): **miễn trừ 2 giây** — trong
+  2 giây đầu không thích ứng gì, ở mốc 3 giây (trước đây còn bị miễn trừ 5 giây) đã hạ; cửa sổ 1 chưa hạ (cần
+  2 cửa sổ chậm), cửa sổ 2 nhảy thẳng **1,0 → 0,80**, rồi mỗi 2 cửa sổ −0,1 tới sàn 0,50, đơn điệu, bậc thang
+  đóng băng. Hồ sơ medium2 mô phỏng: nghẽn hỗn hợp hạ scale tới sàn 0,70 và **không bao giờ đổi bậc**; cùng
+  hồ sơ nhưng GPU-bound (GPU 45 ms) thì vẫn tụt bậc bình thường medium2 → low → ultra. **Hysteresis:** sau
+  khi hạ, 20 cửa sổ frame tốt trong 6 giây mô phỏng không nâng được scale; qua mốc 10 giây thì nâng lại
+  0,70 → 0,75. Hồi quy máy khỏe: 10 cửa sổ frame tốt, scale giữ nguyên 1,0. `thumbsAllowed` trên máy yếu:
+  menu thường = được phép, vue aérienne = chặn, pause trong trận = chặn. **Vue aérienne đo từ bên trong
+  `renderFrame`:** 8/8 mẫu ở scale 0,6 (vùng vẽ 576 px = 1280 × 0,75 × 0,6), và `RQ.scale` đọc từ ngoài frame
+  vẫn là 1,0 (khôi phục đúng).
+- **Chưa kiểm chứng được trong máy ảo:** một trận solo chơi thật đo scale tụt theo thời gian thực — máy ảo
+  SwiftShader chạy dưới 4 FPS, khoảng cách frame > 250 ms khiến cửa sổ đo 30 frame của chính game bị xóa theo
+  thiết kế (và gap > 2,5 s đặt lại `GPUF.t0`), nên dynres không tích lũy được cửa sổ nào; đây là giới hạn môi
+  trường đo, không phải hành vi trên máy thật (máy UHD 620 ở 15–40 FPS có interval 25–66 ms, nằm trọn trong
+  cửa sổ đo). Việc tụt scale trong trận thật cần xác nhận lại ở Phase 0 trên máy yếu thật của user. Nhịp
+  `vwTick`/`skinLive` giảm một nửa được kiểm chứng bằng đọc code + không lỗi runtime, chưa đo FPS menu thực tế.
+
+## 11. Cách build lại
 
 ```bash
 python3 build.py   # sinh dist/riposte-frontline.html, đã nhúng cả I18N_EN và I18N_VI

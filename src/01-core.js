@@ -269,6 +269,10 @@ const GPU_WEAK = /\bGMA\b|Mobile Intel|Sandybridge|Ivybridge|Ironlake|Bay ?Trail
    530/620, UHD 610/620/630 et UHD sans numéro (Ice Lake G1), Iris 5100/6100, Iris Plus 640/650/655 et Iris Plus
    sans numéro (Ice Lake G4/G7) ; ni Iris Pro, ni Iris Xe, ni UHD 7xx, ni aucune carte dédiée. */
 const GPU_IGPU = /Intel(?:\(R\))? (?:HD Graphics (?:515|520|530|620)\b|UHD Graphics(?: (?:610|620|630)\b| (?!\d)|,|\)|$)|Iris(?:\(R\)|\(TM\))? (?:Graphics (?:5100|6100)\b|Plus Graphics(?: (?:640|650|655)\b| (?!\d)|,|\)|$)))/i.test(GPU_NAME);
+/* Ensemble des puces lentes pour les adaptations « machine faible » (Phase 2 du plan d'amélioration) : rendu logiciel,
+   puces de GPU_WEAK et puces intégrées 2015-2020 de GPU_IGPU. Sur ces machines, la résolution dynamique réagit plus
+   tôt, la vue aérienne du choix de la classe et les aperçus 3D des menus sont allégés (09-game.js, 09o-vitrine.js). */
+const GPU_LOW = GPU_SOFT || GPU_WEAK || GPU_IGPU;
 /* Profil Minimale en vigueur au lancement (choisi, ou mode automatique sur une puce de GPU_WEAK ou en rendu logiciel) : ce qui ne se change qu'en
    recompilant tous les shaders se décide ici, une fois (ombres calculées coupées, pas de pré-passe, pas de gazon, tissus simulés comme sur téléphone).
    Le reste du profil (QUALITY.ultra) s'applique à chaud ; choisir ou quitter Minimale dans les Options propose de relancer le jeu (qualityBootCheck). */
@@ -1348,8 +1352,9 @@ function onResize() {
    résolution ne recrée aucune cible (rendu dans un sous-rectangle, RS) : pas d'à-coup, d'où les petits pas. Chaque remontée ratée
    allonge l'attente avant la suivante (pas d'oscillation), et un changement de profil (anticrénelage, ombres, qui
    recrée les cibles de rendu) demande une confirmation : deux fenêtres lentes de suite pour descendre, deux fois plus
-   de marge pour remonter. Si le processeur est seul en cause, baisser la qualité ne servirait à rien : on ne touche
-   à rien. Le temps GPU est mesuré directement quand le navigateur le permet (EXT_disjoint_timer_query_webgl2) : c'est
+   de marge pour remonter. Si le processeur semble seul en cause, on ne change jamais de profil (ce sont les cibles
+   recréées qui coûteraient) ; la résolution seule peut descendre (dynScaleDown), au cas où le goulot serait mixte —
+   puce intégrée qui partage sa puissance avec le processeur, ou temps GPU non mesurable. Le temps GPU est mesuré directement quand le navigateur le permet (EXT_disjoint_timer_query_webgl2) : c'est
    seulement alors que la résolution peut monter au-delà du profil (écrans haute densité), marge prouvée. */
 /* Cadence haute : à partir de 175 images par seconde (écrans de 240 Hz et plus), les bots (intelligence et animation) et les cascades d'ombres n'ont
    plus besoin de suivre chaque image. HF.k vaut 1 (rien ne change), 2 (240 Hz : bots et ombres proches à 120 Hz) ou 3 (360 Hz). Le joueur, la
@@ -1360,7 +1365,7 @@ const HF = { k: 1 };
 function hfUpdate(fps) { HF.k = fps > (HF.k >= 3 ? 290 : 340) ? 3 : fps > (HF.k >= 2 ? 150 : 175) ? 2 : 1; }
 /* ring : les 256 derniers intervalles entre deux images (hors chargement et onglet masqué) ; la médiane des images par seconde cache les images lentes
    isolées, que le joueur ressent comme des à-coups : worst et low1 (le 1 % le plus lent) les montrent (dynStat) */
-const DYN = { win: [], cpu: 0, gpu: 0, good: 0, need: 4, lastUp: -1e9, slow: 0, lagN: 0, stat: { fps: 0, ms: 0, worst: 0, worstC: 0, low1: 0 }, ring: new Float32Array(256), ringC: new Float32Array(256), tmp: new Float32Array(256), ri: 0 };
+const DYN = { win: [], cpu: 0, gpu: 0, good: 0, need: 4, lastUp: -1e9, lastDown: 0, slow: 0, lagN: 0, stat: { fps: 0, ms: 0, worst: 0, worstC: 0, low1: 0 }, ring: new Float32Array(256), ringC: new Float32Array(256), tmp: new Float32Array(256), ri: 0 };
 function dynStat() {
   const r = DYN.ring, t = DYN.tmp, n = Math.min(DYN.ri, 256); if (n < 30) return DYN.stat;
   let w = 0; for (let i = 0; i < n; i++) { t[i] = r[i]; if (r[i] > r[w]) w = i; }
@@ -1473,16 +1478,31 @@ function stepQuality(dir, step = 0.05) {
   RQ.rung = r; RQ.scale = AUTO_LADDER[r][dir < 0 ? 2 : 1]; resolveQuality(); applyQuality();
   return true;
 }
+/* Baisse de la seule résolution, sans changement de profil (aucune cible recréée, donc pas d'à-coup) : le recours quand
+   le goulot n'est pas purement graphique — processeur faible, puce intégrée qui partage sa puissance avec lui, ou temps
+   GPU non mesurable —, là où stepQuality reste fermé. Mêmes planchers que stepQuality (plancher du profil fixe, bas de
+   l'échelon en automatique) et même gel du mode économique en automatique (profil imposé). Renvoie vrai si ça a bougé. */
+function dynScaleDown(step) {
+  const fixed = QUALITY[gfxSet('quality')];
+  if (!fixed && GFX_SAFE) return false; // mode économique, profil imposé (comme stepQuality)
+  const floor = fixed ? RQ.q.scaleMin : (RQ.rung >= 0 ? AUTO_LADDER[RQ.rung][1] : RQ.q.scaleMin);
+  const sc = Math.round(Math.max(RQ.scale - step, floor) * 100) / 100;
+  if (sc >= RQ.scale) return false;
+  RQ.scale = sc; applyScale(); return true;
+}
 /* Pas de descente : proportionnel au temps GPU mesuré quand il dépasse le budget (le coût suit le nombre de pixels, le carré de l'échelle ;
-   visé : 75 % du budget), de 5 à 20 % ; sans mesure, 10 % pour des images très en retard, 5 % sinon */
+   visé : 75 % du budget), de 5 à 20 % ; sans mesure, 10 % pour des images très en retard, 5 % sinon. Sur puce faible, si
+   les images sont très en retard alors que l'échelle est encore haute, le premier pas saute droit vers 0,80 : grignoter
+   5 % par fenêtre y laisserait de longues secondes injouables. */
 function dynDown(med) {
   const b = frameBudget();
+  if (GPU_LOW && RQ.scale > 0.9 && RQ.scale <= 1.2 && med > b * 1.6) return RQ.scale - 0.8;
   if (DYN.gpu > b * 0.85) return clamp(RQ.scale * (1 - Math.sqrt((b * 0.75) / DYN.gpu)), 0.05, 0.2);
   return med > b * 1.4 ? 0.1 : 0.05;
 }
 function updateDynRes(now, intervalMs, cpuMs) {
   if (GPUT) DYN.gpu = GPUT.poll();
-  if (now - GPUF.t0 < 5000) { DYN.win.length = 0; return; } // premières secondes d'un rendu continu (gpuFrame, 01a-gpu.js) : compilations tardives, mise en route du GPU ; pas de recréation des cibles de rendu
+  if (now - GPUF.t0 < (GPU_LOW ? 2000 : 5000)) { DYN.win.length = 0; return; } // premières secondes d'un rendu continu (gpuFrame, 01a-gpu.js) : compilations tardives, mise en route du GPU ; pas de recréation des cibles de rendu. Puces faibles : 2 s seulement — leur profil de départ est déjà prudent, et chaque seconde pleine résolution y coûte plus cher qu'une compilation tardive
   if (intervalMs > 250 || document.hidden) { DYN.win.length = 0; return; } // onglet en arrière-plan, chargement
   DYN.cpu = DYN.cpu ? DYN.cpu * 0.9 + cpuMs * 0.1 : cpuMs;
   DYN.ringC[DYN.ri & 255] = cpuMs; DYN.ring[DYN.ri++ & 255] = intervalMs; DYN.win.push(intervalMs); if (DYN.win.length < 30) return;
@@ -1509,13 +1529,16 @@ function updateDynRes(now, intervalMs, cpuMs) {
   // d'abord, quel que soit le temps GPU mesuré
   const onTime = med <= budget * 1.04 && p90 < budget * 1.25;
   const roomy = onTime && (!DYN.gpu || DYN.gpu < budget * 0.6);
-  if (slow && (gpuBound || RQ.scale > 1)) {
+  if (slow) {
     DYN.good = 0; DYN.slow++;
     if (now - DYN.lastUp < 3000) DYN.need = Math.min(DYN.need * 2, 96); // la remontée précédente était de trop
-    if (stepQuality(-1, dynDown(med)) === true) DYN.slow = 0;
+    if (gpuBound || RQ.scale > 1) {
+      if (stepQuality(-1, dynDown(med)) === true) { DYN.slow = 0; DYN.lastDown = now; }
+    } else if (DYN.slow >= 2 && dynScaleDown(dynDown(med))) { DYN.slow = 0; DYN.lastDown = now; } // goulot mixte ou temps GPU inconnu : deux fenêtres lentes de suite, puis la résolution seule — jamais le profil, qui recréerait les cibles
   } else if (roomy) {
     DYN.slow = 0;
-    if (++DYN.good >= DYN.need) { const r = stepQuality(1); if (r !== 'wait') DYN.good = 0; if (r === true) DYN.lastUp = now; }
+    if (now - DYN.lastDown < 10000) DYN.good = 0; // hystérésis : après une baisse, 10 s sans remonter, sinon l'image oscille entre net et flou
+    else if (++DYN.good >= DYN.need) { const r = stepQuality(1); if (r !== 'wait') DYN.good = 0; if (r === true) DYN.lastUp = now; }
   } else { DYN.slow = 0; DYN.good = Math.max(0, DYN.good - 1); }
 }
 addEventListener('resize', onResize);
