@@ -56,8 +56,9 @@ function weaponLock(id) {
   const lv = wLevel(u.from);
   return lv >= u.level ? '' : `${_t('Montez le {0} au niveau {1} (niveau {2})', WEAPONS[u.from].name, u.level, lv)}`;
 }
-function attLock(wid, aid) { const L = ATT[aid].lvl, lv = wLevel(wid); return lv >= L ? '' : `${_t('Niveau {0} de l\u0027arme (niveau {1})', L, lv)}`; }
+function attLock(wid, aid) { if (Settings.unlockAll) return ''; const L = ATT[aid].lvl, lv = wLevel(wid); return lv >= L ? '' : `${_t('Niveau {0} de l\u0027arme (niveau {1})', L, lv)}`; } // unlockall : accessoires ouverts aussi
 function camoLock(wid, cid) {
+  if (Settings.unlockAll) return ''; // unlockall : camouflages ouverts aussi
   if (PREVIEW_HOST && (PREVIEW_CAMOS[wid] || []).includes(cid)) return '';
   const L = CAMOS[cid].lvl, lv = wLevel(wid);
   return lv >= L ? '' : `${_t('niveau {0} de l\u0027arme (niveau {1})', L, lv)}`;
@@ -77,6 +78,7 @@ function arsUnlockName(k) {
 
 /* Prochain déblocage de l'arme wid : { level, name } ou null (tout est débloqué) */
 function arsNextUnlock(wid) {
+  if (Settings.unlockAll) return null; // unlockall : tout est déjà débloqué, rien à annoncer
   const lv = wLevel(wid), base = WEAPONS[wid]; let best = null;
   const note = (level, name) => { if (level > lv && (!best || level < best.level)) best = { level, name }; };
   for (const a in ATT) if (attFits(base, a)) note(ATT[a].lvl, ATT[a].name);

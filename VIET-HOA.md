@@ -266,8 +266,15 @@ Theo yêu cầu người chơi (duyệt bởi user): ở màn Solo, chọn trự
   trong `src/06r-arsenal.js` trả về true khi công tắc bật, và UI lớp (`classesHeader`, danh sách ô, panel
   chi tiết trong `src/09e-menus.js`) đi qua cùng cổng này nên hiện « 5/5, tous débloqués » và nút Tạo lớp
   ngay ở cấp 1. Tắt bằng `?unlockall=0` thì các ô **chưa tạo** khóa lại theo cấp như cũ; lớp đã tạo trong
-  lúc bật vẫn còn dữ liệu nhưng không chọn được cho tới khi đủ cấp hoặc bật lại. Khóa phụ kiện/camo theo
-  cấp súng (`attLock`/`camoLock`) vẫn giữ nguyên — ô mở nhưng phụ kiện/camo vẫn phải cày cấp súng.
+  lúc bật vẫn còn dữ liệu nhưng không chọn được cho tới khi đủ cấp hoặc bật lại.
+- **Mở rộng tiếp 2026-11-27 (user duyệt):** rà soát toàn bộ game — khóa theo cấp chỉ có đúng 4 cổng, tất cả
+  tập trung trong `src/06r-arsenal.js`: `weaponLock` (súng), `customUnlocked` (ô lớp), `attLock` (phụ kiện
+  theo cấp cây súng đang gắn), `camoLock` (ngụy trang theo cấp cây súng, cao nhất Holo cấp 30). Nay
+  `attLock`/`camoLock` cũng trả về « không khóa » khi `unlockAll` bật, và `arsNextUnlock()` trả về null
+  (kho vũ khí hiện « đã mở hết » thay vì báo mốc cấp tiếp theo). Vậy `unlockall=1` = mở **toàn bộ nội dung
+  bị khóa theo cấp**; `unlockall=0` khóa lại tất cả — phụ kiện/camo đã gắn trong lúc bật sẽ bị
+  `classCleanAll` gỡ khi tải lại ở trạng thái tắt, đúng như hành vi với súng khóa từ trước. Các thứ không
+  theo cấp (thử thách/défi, killstreak theo số mạng trong trận) không thuộc phạm vi công tắc này.
 
 ## 9. Cải thiện cho máy yếu — Phase 1: phân loại lại iGPU 2015–2020 + gợi ý tiết kiệm trên desktop (2026-11-27)
 
