@@ -411,6 +411,8 @@ relais injoignable ⇒ relay unreachable
 
 # 09e-menus.js
 Séries ⇒ Killstreaks
+Selon la classe ⇒ Class default
+En solo, toutes les armes sont débloquées. ⇒ In solo, all weapons are unlocked.
 Petite ⇒ Small
 Grande ⇒ Large
 Vous êtes dans le salon {0}. Lancer une partie ici le quitte. ⇒ You are in lobby {0}. Starting a match here leaves it.

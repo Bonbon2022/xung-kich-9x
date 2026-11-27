@@ -26,7 +26,9 @@ let mouseDX = 0, mouseDY = 0;
 function giveLoadout() {
   classFix(); // la classe choisie existe toujours (06r-arsenal.js)
   const C = CLASSES[PL.classIdx = Settings.loadout];
-  PL.ent.arms = makeArms(classWeapons(PL.classIdx));
+  const cw = classWeapons(PL.classIdx);
+  if (!MATCH.online) { const sg = soloGunDef(); if (sg) cw[0] = sg; } // solo : l'arme principale choisie pour le solo (toutes débloquées) remplace celle de la classe ; le pistolet reste celui de la classe
+  PL.ent.arms = makeArms(cw);
   PL.ksSel = ESSAI ? essaiKs() : classKs(PL.classIdx); updateStreakHud(); // séries de la classe ; celles déjà prêtes d'une autre classe attendent qu'on la reprenne
   PL.nades = C.nades; PL.nadeType = NADE_TYPES[C.nade] ? C.nade : 'frag'; PL.flashT = 0; PL.knifeT = 0; PL.nadeState = null; PL.knifeOut = false; PL.knifeHold = 0; PL.knifeBtn = null;
   vmSetLook(skinOf(PL.ent), 0); vmEquip(PL.weapons[0].def); VM.action = null;

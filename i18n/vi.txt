@@ -409,6 +409,8 @@ Invitation au salon {0}. Connexion dès la fin du chargement. ⇒ Lời mời v�
 relais injoignable ⇒ không kết nối được máy chủ chuyển tiếp
 # 09e-menus.js
 Séries ⇒ Chuỗi hạ gục
+Selon la classe ⇒ Theo lớp nhân vật
+En solo, toutes les armes sont débloquées. ⇒ Ở chế độ solo, mọi súng đều được mở khóa.
 Petite ⇒ Nhỏ
 Grande ⇒ Lớn
 Vous êtes dans le salon {0}. Lancer une partie ici le quitte. ⇒ Bạn đang ở phòng chờ {0}. Bắt đầu trận ở đây sẽ rời phòng chờ.

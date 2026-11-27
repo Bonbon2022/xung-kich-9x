@@ -170,6 +170,9 @@ function classWeapons(i) {
   const c = CLASSES[i];
   return [weaponDef(c.primary, c.pa, c.pc), weaponDef(c.secondary, c.sa, c.sc)];
 }
+/* Arme principale choisie pour le solo (Settings.soloGun) : en solo, toutes les armes sont débloquées, le verrouillage
+   (weaponLock) ne s'y applique pas ; hors solo, ce réglage est ignoré. null (ou identifiant invalide, ou pistolet) : celle de la classe */
+function soloGunDef() { const id = Settings.soloGun; return (id && WEAPONS[id] && WEAPONS[id].cat !== 'pistol') ? weaponDef(id, [], null) : null; }
 /* Les trois séries d'une classe, rangées par seuil (une classe en cours de retouche peut n'en avoir que deux : complétée) */
 function classKs(i) { const c = CLASSES[i]; return ksFill(c ? c.ks : null); }
 /* Choisit ou retire une série dans une classe personnalisée ; renvoie '' ou la raison du refus. Une série au seuil d'une autre déjà choisie prend sa place */
@@ -183,7 +186,7 @@ function classToggleKs(i, id) {
 }
 /* Construit d'avance les modèles d'une arme montée (vue subjective et vue extérieure) : le menu, pas la partie, en paie le coût */
 function gunPrebuild(def) { if (!VM.models[def.key]) VM.models[def.key] = vmGunModel(def.key); worldGunGeometry(def.key); }
-function arsenalPrebuild() { for (const i of classIds()) for (const d of classWeapons(i)) gunPrebuild(d); }
+function arsenalPrebuild() { for (const i of classIds()) for (const d of classWeapons(i)) gunPrebuild(d); const sg = soloGunDef(); if (sg) gunPrebuild(sg); }
 /* Libère les modèles construits pour des essais d'accessoires dans l'Armurerie : on garde ceux des classes, des armes nues
    (bots, armes au sol) et tout ce qu'un soldat, une arme au sol ou la killcam porte encore */
 function gunTrim() {

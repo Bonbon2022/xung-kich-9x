@@ -207,7 +207,48 @@ Tóm tắt phần đã làm ở phía game, **hoàn thành ở local, chưa comm
   chứng bằng `Peer` giả lập tiêm vào trang (chứng minh vá gọi đúng `netHost` với mã chỉ định và phát
   sự kiện); kết nối PeerJS cloud thật cần kiểm chứng lại trên bản deploy.
 
-## 8. Cách build lại
+## 8. Tính năng fork: chọn súng solo — mọi súng đều mở khóa trong solo (2026-11-27)
+
+Theo yêu cầu người chơi (duyệt bởi user): ở màn Solo, chọn trực tiếp súng chính cho trận solo; trong solo
+**mọi súng chính đều dùng được bất kể cấp độ/khóa tiến trình**. Ngoài solo (kho vũ khí, lớp nhân vật, online)
+`weaponLock` áp dụng như cũ — tính năng này không đụng hệ lớp nhân vật và không đụng online.
+**Hoàn thành ở local, chưa commit/push.**
+
+- **Cài đặt:** `Settings.soloGun` (mặc định `null` = dùng súng theo lớp) thêm vào literal `Settings` ở
+  `src/01-core.js`; lưu/tải qua `saveSettings()`/`dc_settings` như mọi cài đặt khác (bản lưu cũ không có khóa
+  này thì `Object.assign` giữ mặc định `null`).
+- **Hàm dùng chung:** `soloGunDef()` ở `src/06r-arsenal.js` (cạnh `classWeapons`) — trả
+  `weaponDef(Settings.soloGun, [], null)` (súng trần, không phụ kiện/camo) nếu id hợp lệ và `cat !== 'pistol'`,
+  ngược lại `null`. `arsenalPrebuild()` được mở rộng để `gunPrebuild` thêm def của súng solo, tránh khựng
+  nạp model khi vào trận.
+- **Áp dụng:** `giveLoadout()` ở `src/08-player.js` — cờ phân biệt solo/online là `MATCH.online` (cờ chuẩn,
+  đã dùng sẵn trong chính file này và ở `07-bots.js`, `06r-arsenal.js`). Khi `!MATCH.online` và
+  `soloGunDef()` khác `null`: `classWeapons(...)[0]` được thay bằng def súng solo rồi mới `makeArms(...)`;
+  súng phụ, chuỗi hạ gục, lựu đạn vẫn của lớp. Online giữ nguyên 100% hành vi cũ.
+- **Giao diện (`src/09e-menus.js`):** màn Solo (`SOLO_PAGES.solo`) thêm dòng link « Arme principale »
+  (giá trị: tên súng đã chọn hoặc « Theo lớp nhân vật ») trỏ tới trang mới `SOLO_PAGES.gun` — lưới thẻ theo
+  mẫu trang `map` (`grid: true`, thẻ `lcard`): thẻ đầu « Theo lớp nhân vật » (chọn = xóa override), rồi mọi
+  súng `cat !== 'pistol'` xếp theo `WEAPON_CATS` với tiêu đề nhóm chèn bằng hàng `node` chiếm trọn chiều
+  ngang lưới; ảnh thẻ là thumbnail kho vũ khí (`weaponThumb(id)`, `09o-vitrine.js`), mở trang có gọi
+  `thumbsStart()` để nạp nốt thumbnail. Đầu trang có ghi chú « Ở chế độ solo, mọi súng đều được mở khóa. »
+  Trang này **không gọi `weaponLock`** — đó là cốt lõi của tính năng. Chọn thẻ → lưu `Settings.soloGun` +
+  `saveSettings()` + `lmPop` về màn Solo như mẫu trang map.
+- **i18n:** khóa « Arme principale » đã có sẵn trong từ điển (Anh « Primary weapon », Việt « Vũ khí chính » —
+  giữ nguyên bản dịch cũ cho nhất quán toàn game). Thêm 2 khóa mới vào section `09e-menus.js` của cả
+  `i18n/en.txt` và `i18n/vi.txt`: « Selon la classe » (Class default / Theo lớp nhân vật) và
+  « En solo, toutes les armes sont débloquées. » (In solo, all weapons are unlocked. / Ở chế độ solo, mọi
+  súng đều được mở khóa.). Từ điển: **1.618/1.618 entry**, `check_i18n.py` **0 lỗi**, `python3 build.py` sạch.
+- **Kiểm chứng headless (Chromium, bản build local, `dc_settings.lang='vi'`): 19/19 PASS** — màn Solo có
+  dòng « Vũ khí chính » với giá trị mặc định « Theo lớp nhân vật »; trang súng có đúng 15 thẻ (1 lớp + 14
+  súng chính: 4 nhóm AR/SMG/súng tỉa/shotgun), có AK-47 và SCAR-H, không thẻ nào khóa, không súng lục;
+  chọn L96A1 → dòng súng hiện « L96A1 », đã lưu vào `dc_settings`, reload trang vẫn còn; gọi trực tiếp
+  `giveLoadout()` trong ngữ cảnh trang (cách thay thế việc vào trận thật, theo đúng điểm trang bị khi
+  vào trận/hồi sinh): solo + `soloGun='l96'` → `PL.ent.arms` = [l96, m9 của lớp]; `soloGun=null` → [m4, m9]
+  như cũ; giả lập cờ `MATCH.online=true` → soloGun bị bỏ qua, dùng súng lớp. Chưa kiểm chứng bằng một trận
+  solo chơi thật từ đầu tới cuối trong máy ảo (nặng), nhưng `giveLoadout()` là đúng hàm mà luồng vào
+  trận/hồi sinh gọi.
+
+## 9. Cách build lại
 
 ```bash
 python3 build.py   # sinh dist/riposte-frontline.html, đã nhúng cả I18N_EN và I18N_VI

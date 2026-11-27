@@ -499,6 +499,26 @@ function soloSet(k, v) {
   saveSettings();
 }
 function soloCfg() { const MD = MODES[Settings.mode] || MODES.tdm; return { map: Settings.map, mode: Settings.mode, diff: Settings.difficulty, limit: Settings[MD.key], time: Settings.minutes, online: false, edit: true, set: soloSet }; }
+/* Cartes du choix de l'arme principale en solo : toutes les armes principales par catégorie, SANS le verrouillage de progression
+   (en solo, toutes les armes sont débloquées — weaponLock ne s'applique qu'à l'armurerie et aux classes). La première carte rend
+   la main à la classe (Settings.soloGun = null). Vignettes : celles de l'armurerie (weaponThumb, 09o-vitrine.js). Dans la grille,
+   la remarque et les titres de catégorie occupent toute la largeur (rangées « node » à colonne pleine). */
+function soloGunCards() {
+  const pick = (id) => { Settings.soloGun = id; saveSettings(); sfxUi('click'); lmPop(LM.scr.solo); };
+  const span = (el) => { el.style.gridColumn = '1 / -1'; return { k: 'node', node: el }; };
+  const note = document.createElement('p'); note.className = 'lnote hint'; note.textContent = _t('En solo, toutes les armes sont débloquées.');
+  const rows = [span(note)];
+  const sg = soloGunDef(), c0 = CLASSES[Settings.loadout];
+  rows.push({ k: 'card', key: 'classe', label: _t('Selon la classe'), tag: c0 && WEAPONS[c0.primary] ? WEAPONS[c0.primary].name : '', art: c0 ? weaponThumb(c0.primary) : '', on: !sg, badge: !sg ? _t('Sélectionnée') : '', pick: () => pick(null) });
+  for (const c of WEAPON_CATS) {
+    if (c.id === 'pistol') continue;
+    const ids = Object.keys(WEAPONS).filter((id) => WEAPONS[id].cat === c.id);
+    if (!ids.length) continue;
+    const h = document.createElement('h4'); h.className = 'lsep'; h.textContent = c.name; rows.push(span(h));
+    for (const id of ids) { const w = WEAPONS[id], on = !!sg && Settings.soloGun === id; rows.push({ k: 'card', key: id, label: w.name, tag: w.type, art: weaponThumb(id), on, badge: on ? _t('Sélectionnée') : '', pick: () => pick(id) }); }
+  }
+  return rows;
+}
 const SOLO_PAGES = {
   solo: () => {
     const m = mapById(Settings.map);
@@ -506,6 +526,7 @@ const SOLO_PAGES = {
     const MD = MODES[Settings.mode];
     const rows = [ // la carte et les paramètres sont dans l'encart, sous le menu
       { k: 'link', key: 'map', label: _t('Carte'), page: 'map' },
+      { k: 'link', key: 'gun', label: _t('Arme principale'), value: soloGunDef() ? WEAPONS[Settings.soloGun].name : _t('Selon la classe'), page: 'gun' },
       { k: 'link', key: 'setup', label: _t('Paramètres de partie'), page: 'setup' },
       { k: 'link', key: 'class', label: _t('Modifier la classe'), open: () => uiGo('classes') },
     ];
@@ -513,6 +534,7 @@ const SOLO_PAGES = {
     return { title: _t('Solo'), sub: MD.sub, rows, stage: soloStage, preview: mapPreview(m, soloCfg()) };
   },
   map: () => ({ head: _t('Carte'), grid: true, rows: mapCards(Settings.map, (id) => { Settings.map = id; saveSettings(); sfxUi('click'); lmPop(LM.scr.solo); }) }),
+  gun: () => { thumbsStart(); return { head: _t('Arme principale'), grid: true, rows: soloGunCards() }; },
   setup: () => ({ head: _t('Paramètres de partie'), rows: matchRows(soloCfg()) }),
 };
 function renderSolo() { lmRender(LM.scr.solo); $('soloGo').title = netInLobby() ? _t('Lancer une partie solo vous fait quitter le salon') : ''; }
