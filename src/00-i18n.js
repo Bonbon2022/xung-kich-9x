@@ -7,34 +7,36 @@
    si le navigateur le demande en premier ; un changement recharge la page. Voir README, « Langues ».
    ========================================================================== */
 const I18N_EN = /*__I18N_EN__*/ {};
+const I18N_VI = /*__I18N_VI__*/ {}; // dictionnaire vietnamien (i18n/vi.txt), intégré par build.py comme I18N_EN
 const I18N_MISS = new Set(); // clés absentes du dictionnaire rencontrées en anglais (contrôle : tools/dev/check_i18n.py)
 /* Langue choisie : 'auto', 'en' ou 'fr' (enregistrée avec les réglages) ; la langue effective, LANG, est 'en' ou 'fr' */
 const LANG_PREF = (() => {
-  try { const s = JSON.parse(localStorage.getItem('dc_settings') || 'null'); if (s && (s.lang === 'en' || s.lang === 'fr')) return s.lang; } catch (e) { /* ignoré */ }
+  try { const s = JSON.parse(localStorage.getItem('dc_settings') || 'null'); if (s && (s.lang === 'en' || s.lang === 'fr' || s.lang === 'vi')) return s.lang; } catch (e) { /* ignoré */ }
   return 'auto';
 })();
 const LANG = (() => {
   if (LANG_PREF !== 'auto') return LANG_PREF;
   const l = (typeof navigator !== 'undefined' && (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language])) || [];
-  for (const x of l) { const c = String(x || '').slice(0, 2).toLowerCase(); if (c === 'fr' || c === 'en') return c; }
+  for (const x of l) { const c = String(x || '').slice(0, 2).toLowerCase(); if (c === 'fr' || c === 'en' || c === 'vi') return c; }
   return 'en';
 })();
-const LOCALE = LANG === 'fr' ? 'fr-FR' : 'en-US';
-const PCT = LANG === 'fr' ? ' %' : '%'; // « 10 % » en français, « 10% » en anglais
+const LOCALE = LANG === 'fr' ? 'fr-FR' : LANG === 'vi' ? 'vi-VN' : 'en-US';
+const PCT = LANG === 'fr' ? ' %' : '%'; // « 10 % » en français, « 10% » en anglais et en vietnamien
+const I18N_DICT = LANG === 'vi' ? I18N_VI : I18N_EN; // dictionnaire actif (le français n'en a pas : les clés sont en français)
 function _t(fr, ...a) {
   let s = fr;
-  if (LANG === 'en') { const e = I18N_EN[fr]; if (e !== undefined && Object.prototype.hasOwnProperty.call(I18N_EN, fr)) s = e; else I18N_MISS.add(fr); }
+  if (LANG === 'en' || LANG === 'vi') { const e = I18N_DICT[fr]; if (e !== undefined && Object.prototype.hasOwnProperty.call(I18N_DICT, fr)) s = e; else I18N_MISS.add(fr); }
   return a.length ? s.replace(/\{(\d+)\}/g, (m, i) => (+i < a.length ? String(a[+i]) : m)) : s;
 }
 /* Pluriel : one sert pour 1 en anglais, pour 0 et 1 en français ; les deux formes se traduisent séparément */
-function _tn(n, one, many, ...a) { return _t((LANG === 'en' ? n === 1 : n < 2) ? one : many, n, ...a); }
+function _tn(n, one, many, ...a) { return _t((LANG === 'en' || LANG === 'vi' ? n === 1 : n < 2) ? one : many, n, ...a); } // vietnamien : comme l'anglais, « one » pour 1 seul (le vietnamien n'a pas de pluriel ; les deux formes sont traduites dans vi.txt)
 /* Nombre et date selon la langue */
 function fmtNum(n, digits) { return Number(n).toLocaleString(LOCALE, digits === undefined ? undefined : { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
 function fmtDate(d, opts) { return d.toLocaleDateString(LOCALE, opts); }
 /* Traduit les textes statiques de la page (shell.html) : nœuds de texte et attributs dont le texte est une clé du dictionnaire */
 function i18nDom(root) {
-  if (LANG !== 'en') return;
-  const tr = (s) => { const k = s.trim(); if (!k || !Object.prototype.hasOwnProperty.call(I18N_EN, k)) return s; return s.replace(k, () => I18N_EN[k]); };
+  if (LANG !== 'en' && LANG !== 'vi') return;
+  const tr = (s) => { const k = s.trim(); if (!k || !Object.prototype.hasOwnProperty.call(I18N_DICT, k)) return s; return s.replace(k, () => I18N_DICT[k]); };
   const w = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.nodeType === 1 && (n.tagName === 'SCRIPT' || n.tagName === 'STYLE') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
   for (let n = w.currentNode; n; n = w.nextNode()) {
     if (n.nodeType === 3) { const v = tr(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; continue; }
@@ -44,4 +46,4 @@ function i18nDom(root) {
 }
 document.documentElement.lang = LANG;
 i18nDom(document.body);
-if (LANG === 'en') document.title = _t(document.title); // titre de l'onglet (dans <head>, hors de body)
+if (LANG === 'en' || LANG === 'vi') document.title = _t(document.title); // titre de l'onglet (dans <head>, hors de body)

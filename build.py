@@ -136,7 +136,11 @@ print("illustrations des cartes :",", ".join(f"{k} ({os.path.getsize('dist/'+v)/
 en_dict,en_errs=i18n.load_en()
 if en_errs: raise SystemExit("i18n/en.txt :\n  "+"\n  ".join(en_errs))
 print("dictionnaire anglais :",len(en_dict),"entrées")
-for mark,val in (("/*__I18N_EN__*/ {}",json.dumps(en_dict,ensure_ascii=False,separators=(",",":")).replace("<","\\u003c")),("/*__TEX_PACKS__*/ {}",json.dumps(packs)),("/*__SFX_PACKS__*/ {}",json.dumps(sfx)),("/*__MAP_ART__*/ {}",json.dumps(art))):
+# Dictionnaire vietnamien (i18n/vi.txt) : même format, intégré au marqueur /*__I18N_VI__*/ (voir VIET-HOA.md)
+vi_dict,vi_errs=i18n.load_vi()
+if vi_errs: raise SystemExit("i18n/vi.txt :\n  "+"\n  ".join(vi_errs))
+print("dictionnaire vietnamien :",len(vi_dict),"entrées")
+for mark,val in (("/*__I18N_EN__*/ {}",json.dumps(en_dict,ensure_ascii=False,separators=(",",":")).replace("<","\\u003c")),("/*__I18N_VI__*/ {}",json.dumps(vi_dict,ensure_ascii=False,separators=(",",":")).replace("<","\\u003c")),("/*__TEX_PACKS__*/ {}",json.dumps(packs)),("/*__SFX_PACKS__*/ {}",json.dumps(sfx)),("/*__MAP_ART__*/ {}",json.dumps(art))):
     if js.count(mark)!=1: raise SystemExit("marqueur introuvable ou en double dans src/ : "+mark)
     js=js.replace(mark,val)
 # Syntaxe du script assemblé (node --check) : une erreur de syntaxe passait sans bruit, et la page restait blanche au chargement (les outils

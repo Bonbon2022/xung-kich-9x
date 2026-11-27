@@ -7,8 +7,13 @@ def unesc(s): return s.replace("\\\\","\x00").replace("\\n","\n").replace("\x00"
 def esc(s): return s.replace("\\","\\\\").replace("\n","\\n")
 def load_en(root="."):
     """Retourne (dict, erreurs). Les fichiers sont i18n/en*.txt, lus dans l'ordre alphabétique."""
+    return _load(root,"en")
+def load_vi(root="."):
+    """Retourne (dict, erreurs). Les fichiers sont i18n/vi*.txt, lus dans l'ordre alphabétique."""
+    return _load(root,"vi")
+def _load(root,prefix):
     d={}; errs=[]
-    for f in sorted(glob.glob(os.path.join(root,"i18n","en*.txt"))):
+    for f in sorted(glob.glob(os.path.join(root,"i18n",prefix+"*.txt"))):
         for n,l in enumerate(open(f,encoding="utf-8").read().split("\n"),1):
             if not l.strip() or l.lstrip().startswith("#"): continue
             if l.count(SEP)!=1: errs.append(f"{f}:{n} : un seul « ⇒ » attendu"); continue
