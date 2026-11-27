@@ -374,7 +374,93 @@ commit/push.** Không thêm chuỗi i18n nào (`check_i18n.py` 0 lỗi, 1.618/1.
   cửa sổ đo). Việc tụt scale trong trận thật cần xác nhận lại ở Phase 0 trên máy yếu thật của user. Nhịp
   `vwTick`/`skinLive` giảm một nửa được kiểm chứng bằng đọc code + không lỗi runtime, chưa đo FPS menu thực tế.
 
-## 11. Cách build lại
+## 11. Cải thiện cho máy yếu — Phase 2.5: UHD 7xx GT1 vào nhóm iGPU + chia nhịp bot chống spike (2026-11-27)
+
+Xuất phát từ báo cáo hiệu năng THẬT đầu tiên trên máy yếu (tester: i3 + **Intel UHD Graphics 730**, 16GB, FHD,
+solo TDM map sable, đo trên bản cũ `a36d4d63` — trước Phase 1): FPS trung bình 33,1 (1% low 14,9); game tự hạ
+hết cỡ medium → medium2 → low → Minimale ở scale 0,50 mà GPU vẫn ~20 ms/khung; draw calls ~450–570, tam giác
+~1,5–1,9 triệu ngay cả ở Minimale; CPU code ~12,2 ms/khung, trong đó cột bots trung bình 2,0 ms nhưng có khung
+vọt **30,9 ms**. Hai kết luận: (1) nút thắt là chi phí cố định, không phải độ phân giải; (2) UHD 730 chưa nằm
+trong nhóm GPU_IGPU của Phase 1 (tester cũng không thấy bảng hỏi Tiết kiệm pin — hệ quả cùng một khe hở).
+
+### A. Bổ sung UHD 710/730/750 vào GPU_IGPU — `src/01-core.js`
+
+- Regex `GPU_IGPU` (dòng ~271): nhóm UHD có số thêm `710|730|750` (GT1 của Rocket Lake / Alder Lake, sức mạnh
+  ngang UHD 630). Các máy này nay xuất phát ở **medium2** trong chế độ Tự động và được gợi ý eco như các iGPU
+  2015–2020 khác. Comment khối phía trên được sửa tương ứng (bỏ "ni UHD 7xx", ghi rõ lý do + mốc đo).
+- TUYỆT ĐỐI không bắt: **UHD 770** (GT2, mạnh hơn hẳn — đã kiểm chứng âm tính), Iris Xe, Iris Pro, GPU rời, Apple.
+- Kiểm chứng bằng chuỗi renderer ANGLE ghi đè qua init script (code thật tự phân loại): UHD 710 / 730 (đúng
+  chuỗi của tester, có mã `0x00004692`) / 750 → `GPU_IGPU = true`, tier `medium2`; UHD 770 → `false`, tier
+  `medium`; hồi quy UHD 620 → medium2, UHD không số → medium2, GTX 1650 → high, Iris Xe → không bắt. **8/8 đạt.**
+
+### B. Chia nhịp bot chống spike — `src/07-bots.js`, `src/07b-tactics.js`
+
+Bằng chứng đồng bộ pha tìm được trong code (nguồn gốc của khung bots 30,9 ms):
+
+- `botSense` vốn đã chia nhịp tốt: `senseT` khởi tạo ngẫu nhiên trong `makeBot`, mỗi chu kỳ tung lại
+  `rand(0,12–0,22)` s và KHÔNG reset khi hồi sinh → pha trôi, không khóa nhau. Chu kỳ quyết định ổn định cũng
+  tự rải (`decideT = rand(0,6–1,2)` sau mỗi lần quyết định). Phần thiếu nằm ở các **sự kiện đồng bộ**:
+- `initTactics()` đặt `b.decideT = 0` cho MỌI bot mỗi lần hồi sinh; bot chết cùng lúc (nổ, loạt đạn) hồi sinh
+  cùng lúc (TDM `botRespawn` 5,5 s như nhau) → quyết định + tìm đường dồn một khung.
+- `forceDecide = true` được đặt đồng loạt cho nhiều bot trong cùng một khung khi người chơi lộ diện / dính
+  flash → khung kế tiếp tất cả cùng chạy `decideTactic` (quét `findCover`, `flankPoint`, `pickGoal` + A*
+  `findPath`).
+- `setPath()` đặt `b.repathT = 1,5` CỐ ĐỊNH → các bot tìm đường cùng lúc sẽ tìm lại cùng lúc sau 1,5 s (tiếng
+  vọng đồng bộ). Ngay đầu trận, 11 bot cùng `pickGoal` + A* trong vài khung đầu sau đếm ngược.
+
+Đã làm (chỉ đổi THỜI ĐIỂM tính trong vài chục ms; không đổi chất lượng quyết định, độ khó DIFFS, hành vi
+bắn/di chuyển từng frame):
+
+1. **Ngân sách quyết định nặng mỗi khung** (`decideGate` trong `07b-tactics.js`, ngay trước `updateBot`):
+   tối đa **2** lần `decideTactic`/khung, cộng 1 slot riêng cho quyết định bị ép (tổng trần 3). Bot thường bị
+   hoãn được đặt `decideT = 0,03 + (id % 4) × 0,012` (thử lại sau ~30–70 ms); bot bị ép vượt trần **giữ nguyên
+   `forceDecide`** để chạy ở khung kế tiếp (trễ 1–3 khung = 16–50 ms, vô hình so với thời gian phản ứng
+   160–800 ms của bot; bắn không qua cổng này nên bot mới hồi sinh vẫn phản ứng ngay bằng cảm biến + súng).
+   Bộ đếm khóa theo đồng hồ trận `now` — mọi bot trong cùng một lượt `botsTick` dùng chung một `now`.
+2. **Rải quyết định + mục tiêu đầu sau hồi sinh** (`initTactics`): `decideT = (id % 6) × 0,12 + rand(0–0,15)`
+   (trước đây là 0 cho tất cả); trường mới `goalT` (khai báo trong `BOT_STATE` ở `07-bots.js`, đặt
+   `(id % 6) × 0,09 + rand(0–0,12)`) — nhánh `roam` mặc định của `updateBot` chờ `goalT` mới gọi
+   `pickGoal`/`setPath` lần đầu (bot đứng yên, súng sẵn sàng, vẫn bắn được nếu thấy địch).
+3. **Rải repath** (`setPath` trong `07-bots.js`): `repathT = 1,5 + (id % 5) × 0,15 + rand(0–0,25)` (1,5–2,35 s);
+   cơ chế "mục tiêu lệch > 3 m thì tìm lại ngay" trong `follow()` giữ nguyên nên truy đuổi không bị cũ.
+
+Kiểm chứng (headless SwiftShader, script `~/workspace/test-rig/phase25-test*.js`):
+
+- Build sạch, `check_i18n.py` 0 lỗi (1.618/1.618). Vào được trận solo TDM thật (dùng hook test chính thức của
+  game `window.MATCH_COUNTDOWN = 0` để bỏ đếm ngược giữ bot), **không lỗi JS** của game.
+- Cổng ngân sách: kiểm tra đơn vị trên `decideGate` + kiểm tra sống trong `updateBot` — ép cả 11 bot đến hạn
+  cùng một khung: đúng **2** quyết định chạy, 9 bot hoãn; ép `forceDecide` cả 11: đúng **3** chạy, 8 bot giữ
+  cờ sang khung sau. Công thức rải `decideT`/`goalT`/`repathT` khớp theo chỉ số bot trên cả 11 bot thật.
+- Mô phỏng logic 1.500 tick (75 giây game, lái trực tiếp `botsTick`): tổng 1.014 lần `decideTactic`, **không
+  tick nào vượt 3**; bot di chuyển thật (12 giây đầu: 11/11 bot rời spawn, tổng quãng đường 589 m) và đấu súng
+  thật (**1.101 phát bắn** trong 75 giây). Kill = 0 trong harness này — giao tranh tầm xa + bot hồi 30 máu/s
+  sau 5 giây không trúng đạn; bản vá không đụng đường cảm biến/ngắm/sát thương nên không quy cho bản vá.
+- **Giới hạn đo:** máy ảo SwiftShader chỉ chạy được ~14 khung hình/90 giây giờ tường (CPU ảo bị throttle) nên
+  không đo được cột bots (ms) trong trận render thật; bằng chứng giảm spike là cấu trúc (số quyết định nặng mỗi
+  khung bị chặn cứng 2+1, kiểm đếm được) + không hồi quy hành vi. Số ms thật cần đo lại trên máy UHD 730 của
+  tester theo file hướng dẫn đo FPS (mục 9/10) sau khi bản này lên sóng.
+
+### C. Khảo sát draw call / tam giác ở Minimale trên sable — CHỈ ĐỀ XUẤT, chưa làm
+
+Đo trong trang (boot ULTRA, sable, nhìn từ điểm spawn): **209 draw calls, ~697k tam giác/khung**; tổng hình
+học map đã gộp `WORLD.tris = 624.296`; 358 mesh (51 InstancedMesh, 27 SkinnedMesh); nav 7.683 nút; bóng tính
+sẵn TẮT khi boot ULTRA. Con số của tester cao hơn (450–570 calls, 1,5–1,9M tris) vì: máy tester boot ở medium
+nên khi thang tự động tụt xuống Minimale **shadow pass vẫn bật** (512, 1 cascade) = vẽ lại gần như toàn cảnh
+một lần nữa; cộng thêm góc nhìn giữa map, viewmodel súng và hiệu ứng. Phân bổ ước lượng: **map gộp theo vật
+liệu chiếm ~85–90% tam giác** (mesh đơn lớn nhất: steel 34,4k, plastic 30,2k, concrete 28,1k tris — gộp toàn
+map nên frustum culling gần như vô hiệu); lính + súng: hình học LOD cao ~24,4k tris/con, `lodPx` ở Minimale là
+260 nên đổi LOD muộn; địa hình sable phẳng nằm trong chính các buffer gộp; sky/nước nhỏ.
+
+Đòn bẩy đề xuất (chưa triển khai, chờ duyệt): (1) tắt shadow pass khi thang auto chạm rung Minimale — neo
+`SHADOWS.on`/đường áp chất lượng trong `01-core.js` + `09-game.js`, tiết kiệm gần một lần vẽ toàn cảnh đúng
+kịch bản của tester, rủi ro thị giác thấp; (2) chia buffer map gộp theo khu vực để frustum culling có tác
+dụng — neo `02a-kit.js` (`WORLD.bufs`/`kitEnd`), tiềm năng −30–50% tam giác map, công sức trung bình, phải giữ
+build tất định cho netcode; (3) `lodPx` Minimale 260 → ~400 — neo `QUALITY.ultra` (`01-core.js`), lính dùng
+LOD thấp sớm hơn, ở scale 0,5 gần như không thấy khác; (4) `detail`/`scatter` Minimale 24 m/14 m → ~16 m/10 m —
+neo `QUALITY.ultra` + `updateMapDetail` (`02a-kit.js`), rủi ro pop-in gần; (5) `updateMapDetail` hiện quét
+toàn bộ danh sách fine/scatter mỗi khung — giảm nhịp xuống ~150 ms, rủi ro bằng không.
+
+## 12. Cách build lại
 
 ```bash
 python3 build.py   # sinh dist/riposte-frontline.html, đã nhúng cả I18N_EN và I18N_VI

@@ -139,7 +139,14 @@ function initTactics(b) {
   const mates = entities.filter((o) => !o.isPlayer && o.team === b.team);
   b.lane = Math.random() < 0.35 ? pick(LANE_ROLES) : LANE_ROLES[Math.max(0, mates.indexOf(b)) % LANE_ROLES.length]; b.holdT = 0; // la route habituelle de son rang, ou, une vie sur trois, une autre
   b.revenge = b.grudge && MATCH.mode !== 'dom' && MATCH.time - b.grudge.t < 90 && Math.random() < 0.4 * (0.5 + b.aggr) ? b.grudge : null; b.grudge = null; // revenir où l'on a été tué, parfois
-  b.tactic = 'roam'; b.decideT = 0; b.suppr = 0; b.fear = 0; b.lastHitT = -9; b.cover = null; b.inCoverT = 0; b.move = 'strafe'; b.moveT = 0; b.sprinting = false;
+  b.tactic = 'roam'; b.suppr = 0; b.fear = 0; b.lastHitT = -9; b.cover = null; b.inCoverT = 0; b.move = 'strafe'; b.moveT = 0; b.sprinting = false;
+  /* Première décision et premier objectif étalés selon le rang du bot (Phase 2.5) : à zéro pour tous, une
+     réapparition groupée (explosion, frappe) faisait décider et tracer leur chemin à tous les bots dans la même
+     image — le pic mesuré sur machine faible (un cadre à 30 ms de bots). Le bot n'en réagit pas moins vite :
+     sa perception (senseT, déjà tiré au hasard) et son tir ne passent pas par decideT, et le déplacement part
+     dès l'objectif posé ; la décision tactique des premières centaines de ms est de toute façon un retour vide
+     (aucune cible, rien à traquer). */
+  b.decideT = (b.id % 6) * 0.12 + rand(0, 0.15); b.goalT = (b.id % 6) * 0.09 + rand(0, 0.12);
   b.chaseE = null; b.contactT = -99; b.lostWeak = false; b.searchP = null; b.sweepT = 0; b.startleT = 0; b.startleAt = -99;
 }
 
@@ -202,6 +209,25 @@ function decideTactic(b, now) {
   setPath(b, b.lastKnown);
 }
 
+/* Budget de décisions lourdes par image (Phase 2.5) : decideTactic concentre le travail cher et irrégulier de
+   l'IA (findCover : voisinage, tri et jusqu'à sept lignes de vue ; flankPoint ; pickGoal + findPath en A*). Les
+   périodes propres de chaque bot sont déjà tirées au hasard (decideT 0,6 à 1,2 s, senseT 0,12 à 0,22 s : les phases
+   dérivent, rien ne se verrouille), mais deux événements resynchronisent tout le monde : la réapparition groupée
+   (voir initTactics) et le joueur qui se dévoile d'un coup à plusieurs bots (forceDecide posé dans la même image
+   par les branches roam/hunt/flank/search, ou par une flash). Au plus DECIDE_MAX décisions par image, plus une
+   place pour les forcées ; le surplus attend quelques dizaines de ms — sans effet jouable : les temps de réaction
+   des bots font 160 à 800 ms selon la difficulté, et ni la perception ni le tir ne passent par cette porte. La clé
+   est l'horloge de partie (now, commune à tous les bots d'un même passage de botsTick) : à chaque nouvelle image,
+   le compteur repart. */
+const DECIDE_MAX = 2, DECIDE_MAX_FORCED = 3;
+const DECIDE = { t: -1, n: 0 };
+function decideGate(b, now) {
+  if (DECIDE.t !== now) { DECIDE.t = now; DECIDE.n = 0; }
+  if (DECIDE.n >= (b.forceDecide ? DECIDE_MAX_FORCED : DECIDE_MAX)) return false;
+  DECIDE.n++;
+  return true;
+}
+
 function updateBot(b, dt, now) {
   if (b.isRemote) return; // piloté par le réseau (voir netUpdate)
   if (b.off) return;      // hors jeu (match à mort à 8 joueurs)
@@ -225,7 +251,10 @@ function updateBot(b, dt, now) {
   if (b.sq && b.sqSeen !== b.sq.rev) { b.sqSeen = b.sq.rev; if (b.tactic === 'roam') { b.goal = null; b.path = null; b.holdT = 0; } } // le plan d'équipe a changé : on repart
   b.lookYaw = b.yaw; b.dmgMul = D.dmg;
   b.decideT -= dt;
-  if (b.decideT <= 0 || b.forceDecide) { b.forceDecide = false; b.decideT = rand(0.6, 1.2); decideTactic(b, now); }
+  if (b.decideT <= 0 || b.forceDecide) {
+    if (decideGate(b, now)) { b.forceDecide = false; b.decideT = rand(0.6, 1.2); decideTactic(b, now); }
+    else if (!b.forceDecide) b.decideT = 0.03 + (b.id % 4) * 0.012; // budget de l'image plein : on repasse dans quelques dizaines de ms (une décision forcée garde son drapeau et repasse à l'image suivante)
+  }
 
   const T = b.target, vis = !!(b.visible && T && T.alive);
   b.nadeCd -= dt;
@@ -432,7 +461,8 @@ function updateBot(b, dt, now) {
         if (vis) { b.forceDecide = true; b.holdT = 0; }
         break;
       }
-      if (!b.goal || !b.path || b.pathI >= b.path.length) {
+      if (!b.goal && b.goalT > 0) b.goalT -= dt; // premier objectif étalé après l'apparition (initTactics, Phase 2.5) : pickGoal + findPath de tous les bots partaient dans la même image ; il attend sur place, arme prête, et peut tirer
+      else if (!b.goal || !b.path || b.pathI >= b.path.length) {
         if (b.goal && b.goal.hold && b.goal.distanceTo(b.pos) < 2) { b.holdT = b.goal.holdFor || rand(5, 12); b.holdCrouch = Math.random() < 0.5 && b.goal.y < gy0(b.goal.x, b.goal.z) + 1; b.holdLookX = b.pos.x + rand(-6, 6); b.holdLookP = b.goal.look || null; b.goal = null; break; }
         setPath(b, pickGoal(b, now));
       }

@@ -72,7 +72,7 @@ const BOT_STATE = {
   stealth: undefined, peeking: false, peekT: 0, peekSide: 0, leftCoverT: 0, flankPt: null, throwT: 0,
   bump: 0, bumpT: 0, unstickN: 0, unstickAt: -99, sideT: 0, sideDir: 0, backT: 0, recT: 0, recX: 0, recZ: 0, jumpT: 0, coverGoal: null, fwdOk: true, backOk: true,
   pers: null, slideAt: -99, jigT: 0, jigS: 1, rush: false, pace: 2, paceT: 0, glanceT: 0, glanceA: 0, dustT: 0,
-  warnT: 0, stepHeardT: -99, grudge: null, revenge: null, wasVis: false, standT: 0, fleeT: 0, fleeX: 0, fleeZ: 0, nadeOn: true,
+  warnT: 0, stepHeardT: -99, grudge: null, revenge: null, wasVis: false, standT: 0, fleeT: 0, fleeX: 0, fleeZ: 0, nadeOn: true, goalT: 0,
   chaseE: null, contactT: -99, contactD: 0, lostVX: 0, lostVZ: 0, lostWeak: false, searchN: 0, searchP: null, searchC: null, searchPts: null,
   sweepT: 0, sweepDur: 0, sweepYaw: 0, sweepA: 0, startleT: 0, startleAt: -99, blindT: 0, blindW: 0, blindX: 0, blindZ: 0, mkNadeT: -99,
 };
@@ -174,7 +174,10 @@ function pickGoal(b, now) {
   const g = new V3(best[0], best[1], best[2]); g.hold = !!best[4]; return g;
 }
 function setPath(b, target) {
-  b.path = findPath(b.pos, target, botNearNode(b)); b.pathI = 1; b.goal = target.clone(); b.goal.hold = !!target.hold; b.goal.dom = target.dom; b.repathT = 1.5;
+  /* repathT étalé selon le rang du bot (Phase 2.5) : à 1,5 s fixe, les bots partis ensemble (départ de partie,
+     réapparition groupée) recalculaient leur chemin dans la même image ; l'étalement (1,5 à 2,35 s) casse cet écho
+     sans rien changer à la fraîcheur utile — follow() recalcule aussitôt si la cible s'est éloignée du but (07b). */
+  b.path = findPath(b.pos, target, botNearNode(b)); b.pathI = 1; b.goal = target.clone(); b.goal.hold = !!target.hold; b.goal.dom = target.dom; b.repathT = 1.5 + (b.id % 5) * 0.15 + rand(0, 0.25);
   if (!b.path) { b.goal = null; return; }
   if (b.path.length > 1 && !navWalkable(b.pos, b.path[1])) b.pathI = 0; // pas de raccourci à travers une cloison au départ : d'abord le nœud le plus proche
 }

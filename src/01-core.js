@@ -267,8 +267,11 @@ const GPU_WEAK = /\bGMA\b|Mobile Intel|Sandybridge|Ivybridge|Ironlake|Bay ?Trail
    quitte qu'en relançant). En mode automatique, elles partent donc un cran plus bas, en Moyenne allégée (medium2 :
    anticrénelage 2x, pas de relief), et la résolution dynamique ajuste ensuite. Volontairement étroit : HD 515/520/
    530/620, UHD 610/620/630 et UHD sans numéro (Ice Lake G1), Iris 5100/6100, Iris Plus 640/650/655 et Iris Plus
-   sans numéro (Ice Lake G4/G7) ; ni Iris Pro, ni Iris Xe, ni UHD 7xx, ni aucune carte dédiée. */
-const GPU_IGPU = /Intel(?:\(R\))? (?:HD Graphics (?:515|520|530|620)\b|UHD Graphics(?: (?:610|620|630)\b| (?!\d)|,|\)|$)|Iris(?:\(R\)|\(TM\))? (?:Graphics (?:5100|6100)\b|Plus Graphics(?: (?:640|650|655)\b| (?!\d)|,|\)|$)))/i.test(GPU_NAME);
+   sans numéro (Ice Lake G4/G7) ; depuis la Phase 2.5, aussi les UHD 710/730/750 (GT1 de Rocket Lake et Alder Lake,
+   au niveau d'une UHD 630 — mesuré sur une UHD 730 : le mode automatique descendait jusqu'en Minimale à 0,50 sans
+   que le temps GPU baisse, le coût fixe domine) ; ni Iris Pro, ni Iris Xe, ni UHD 770 (GT2, nettement plus forte),
+   ni aucune carte dédiée. */
+const GPU_IGPU = /Intel(?:\(R\))? (?:HD Graphics (?:515|520|530|620)\b|UHD Graphics(?: (?:610|620|630|710|730|750)\b| (?!\d)|,|\)|$)|Iris(?:\(R\)|\(TM\))? (?:Graphics (?:5100|6100)\b|Plus Graphics(?: (?:640|650|655)\b| (?!\d)|,|\)|$)))/i.test(GPU_NAME);
 /* Ensemble des puces lentes pour les adaptations « machine faible » (Phase 2 du plan d'amélioration) : rendu logiciel,
    puces de GPU_WEAK et puces intégrées 2015-2020 de GPU_IGPU. Sur ces machines, la résolution dynamique réagit plus
    tôt, la vue aérienne du choix de la classe et les aperçus 3D des menus sont allégés (09-game.js, 09o-vitrine.js). */
