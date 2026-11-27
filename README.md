@@ -1,11 +1,13 @@
-<h1 align="center"><img src="assets/logo.webp" alt="Riposte: Frontline" width="640"></h1>
+<h1 align="center"><img src="assets/logo.webp" alt="Xung Kích 9X" width="640"></h1>
 
 🇻🇳 Tiếng Việt: [README.vi.md](README.vi.md) — bản Việt hóa của fork này, tiếng Việt là ngôn ngữ mặc định.
 
-**Riposte: Frontline** is a free first-person shooter played in the browser, on desktop and on phones, in the spirit of modern
-Call of Duty games: https://www.playriposte.com
+**Xung Kích 9X** is a free first-person shooter played in the browser, on desktop and on phones, in the spirit of modern
+Call of Duty games: https://xung-kich-9x.vercel.app
 
-This repository is a snapshot of the game's source code, version 5.6.0. It is updated from time to time, not with every
+**Xung Kích 9X** is a Vietnamese fork of **Riposte: Frontline** by BenDBSS
+([BenDBSS/Riposte-Frontline-Source](https://github.com/BenDBSS/Riposte-Frontline-Source)), renamed and localized for
+Vietnamese players — see `README.vi.md` and `VIET-HOA.md`. This repository is a snapshot of the game's source code, version 5.6.0. It is updated from time to time, not with every
 release of the game. You can read it,
 download it and use it for your own games under the MIT License (`LICENSE`), except for the items listed in `NOTICE.md` (name and
 logo, music, soldier animations, some sounds). Development happens elsewhere, so pull requests are not merged. To report a problem,

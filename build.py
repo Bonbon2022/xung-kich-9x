@@ -178,7 +178,7 @@ for k in ("favicon-64","favicon-96","apple-touch-icon","icon-192","icon-512"):
 # Aperçu des liens partagés (balises og: de shell.html) : assets/apercu.jpg (composée par tools/dev/apercu.py), copiée comme les icônes avec
 # une empreinte (cache indéfini). SITE est l'adresse publique de référence du jeu (lien canonique, og:url, og:image) : les autres
 # adresses (sans www, préversions, anciennes adresses .vercel.app) y renvoient ou n'ont pas à être référencées.
-SITE="https://www.playriposte.com"
+SITE="https://xung-kich-9x.vercel.app"
 data=open("assets/apercu.jpg","rb").read(); apercu="icons/apercu."+hashlib.sha1(data).hexdigest()[:8]+".jpg"
 if not os.path.exists("dist/"+apercu): open("dist/"+apercu,"wb").write(data)
 for f in glob.glob("dist/icons/apercu.*.jpg"):
@@ -187,7 +187,7 @@ html=html.replace("__SITE__",SITE).replace("__APERCU__",apercu)
 # Manifeste de l'application installable (Android : « Ajouter à l'écran d'accueil » ouvre le jeu en plein écran, en paysage, sans barre d'adresse)
 for k in ("maskable-192","maskable-512"):
     if k not in icons: raise SystemExit("icône manquante : assets/icon/"+k+".png")
-json.dump({"id":"/","name":"Riposte: Frontline","short_name":"Riposte","description":"FPS en ligne dans le navigateur : solo contre des bots ou en ligne entre amis.",
+json.dump({"id":"/","name":"Xung Kích 9X","short_name":"Xung Kích 9X","description":"FPS miễn phí trên trình duyệt: solo đấu bot hoặc online với bạn bè, không cần tải.",
     "start_url":"./","scope":"./","display":"fullscreen","display_override":["fullscreen","standalone"],"orientation":"landscape","categories":["games"],
     "background_color":"#0E110D","theme_color":"#0E110D","prefer_related_applications":False,
     "icons":[{"src":icons["icon-192"],"sizes":"192x192","type":"image/png","purpose":"any"},{"src":icons["icon-512"],"sizes":"512x512","type":"image/png","purpose":"any"},

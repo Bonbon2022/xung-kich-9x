@@ -1,7 +1,7 @@
-<h1 align="center"><img src="assets/logo.webp" alt="Riposte: Frontline" width="640"></h1>
+<h1 align="center"><img src="assets/logo.webp" alt="Xung Kích 9X" width="640"></h1>
 
-**Riposte: Frontline** là một game bắn súng góc nhìn thứ nhất (FPS) miễn phí, chơi ngay trong trình duyệt, trên máy tính và
-điện thoại, theo tinh thần của các game Call of Duty hiện đại: https://www.playriposte.com
+**Xung Kích 9X** là một game bắn súng góc nhìn thứ nhất (FPS) miễn phí, chơi ngay trong trình duyệt, trên máy tính và
+điện thoại, theo tinh thần của các game Call of Duty hiện đại: https://xung-kich-9x.vercel.app
 
 Kho mã này là một bản chụp (snapshot) mã nguồn của game, phiên bản 5.6.0. Nó được cập nhật theo đợt chứ không theo từng
 bản phát hành của game. Bạn có thể đọc, tải về và dùng nó cho game của riêng mình theo Giấy phép MIT (`LICENSE`), ngoại trừ
@@ -61,8 +61,9 @@ Fork này bổ sung tiếng Việt (từ điển `i18n/vi.txt`) và đặt tiế
 
 ## Bản Việt hóa này (fork)
 
-Đây là bản Việt hóa không chính thức, fork từ `BenDBSS/Riposte-Frontline-Source`, dành cho người chơi Việt Nam. Chi tiết kỹ
-thuật và tiến độ nằm trong `VIET-HOA.md`.
+Đây là bản Việt hóa không chính thức của game **Riposte: Frontline**, fork từ `BenDBSS/Riposte-Frontline-Source`, đã đổi
+tên thành **Xung Kích 9X** (logo, nhạc và các hạng mục loại trừ trong `NOTICE.md` được thay bằng bản riêng của fork — xem
+`VIET-HOA.md` giai đoạn 3), dành cho người chơi Việt Nam. Chi tiết kỹ thuật và tiến độ nằm trong `VIET-HOA.md`.
 
 - **Tiếng Việt là mặc định.** Khi chưa từng chọn ngôn ngữ thủ công, game tự nhận diện ngôn ngữ trình duyệt: nếu ngôn ngữ
   được ưu tiên là tiếng Việt, tiếng Pháp hay tiếng Anh thì dùng ngôn ngữ đó; ngoài ra game mặc định dùng **tiếng Việt**

@@ -8,7 +8,7 @@
      texte rappelle le clavier à l'écran de Steam (bouton Steam et X).
    ========================================================================== */
 const DECK_UI = { t0: performance.now(), asked: false, force: '' }; // force : 'install' ou 'pad', la carte affichée quoi qu'il arrive (tools/dev/visual/menus.js)
-const DECK_SITE = 'https://www.playriposte.com'; // adresse installée quand la page n'est pas servie en http(s) (fichier local)
+const DECK_SITE = 'https://xung-kich-9x.vercel.app'; // adresse installée quand la page n'est pas servie en http(s) (fichier local)
 
 /* Le raccourci téléchargé : un fichier .desktop que KDE exécute d'un double-clic (comme l'installeur de Decky Loader) ; Terminal : on
    voit l'installation avancer. Exec sans guillemet, dollar ni barre oblique inverse dans l'argument (spécification des fichiers .desktop). */

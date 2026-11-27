@@ -1,11 +1,16 @@
-# Contributions
+# Đóng góp / Contributing
 
-Ce dépôt est une copie publique du code de Riposte: Frontline, mise à jour de temps en temps. Le développement se fait ailleurs :
-les pull requests ne sont pas reprises, et la copie suivante les écraserait. Pour signaler un problème ou proposer une idée, passez
-par l'espace Communauté du jeu (https://www.playriposte.com). Vous êtes libre de partir de ce code pour votre propre projet, selon
-`LICENSE` et `NOTICE.md`.
+Đây là **Xung Kích 9X** — bản Việt hóa của game Riposte: Frontline, fork từ
+[`BenDBSS/Riposte-Frontline-Source`](https://github.com/BenDBSS/Riposte-Frontline-Source) theo giấy phép MIT
+(`LICENSE`), tôn trọng các hạng mục loại trừ trong `NOTICE.md` (tên/logo, nhạc, hoạt ảnh, một số âm thanh của bản gốc).
 
-This repository is a public copy of the Riposte: Frontline source code, refreshed from time to time. Development happens
-elsewhere, so pull requests are not merged and the next copy would overwrite them. To report a problem or suggest an idea, use the
-Community space in the game (https://www.playriposte.com). You are free to start your own project from this code, under `LICENSE`
-and `NOTICE.md`.
+Mọi phát triển của bản Việt hóa (dịch thuật, đổi tên, tài nguyên riêng) diễn ra ngay tại repo này:
+báo lỗi và đề xuất xin mở issue tại đây. Các thay đổi ở upstream không tự động chảy về fork này; khi đồng bộ
+bản upstream mới, đối chiếu `VIET-HOA.md` để giữ lại hạ tầng tiếng Việt và thương hiệu Xung Kích 9X.
+
+---
+
+This repository is **Xung Kích 9X**, a Vietnamese fork of Riposte: Frontline
+([`BenDBSS/Riposte-Frontline-Source`](https://github.com/BenDBSS/Riposte-Frontline-Source)), under the MIT
+License (`LICENSE`) and the exclusions listed in `NOTICE.md`. Development of the Vietnamese edition happens
+in this repository — please open issues here. See `VIET-HOA.md` (Vietnamese) for the localization notes.

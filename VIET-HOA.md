@@ -1,7 +1,8 @@
-# Việt hóa Riposte: Frontline — Giai đoạn 1 + 2 (hạ tầng i18n, từ điển, mặc định tiếng Việt, tin tức, README)
+# Việt hóa Riposte: Frontline — Giai đoạn 1 + 2 + 3 (hạ tầng i18n, từ điển, mặc định tiếng Việt, tin tức, README, đổi tên Xung Kích 9X)
 
 Fork: `Bonbon2022/Riposte-Frontline-Source`, từ upstream `BenDBSS/Riposte-Frontline-Source` v5.6.0 (commit 31ca050d).
-Trạng thái giai đoạn 1: **hoàn thành, đã đẩy lên fork (commit 82e68590).** Giai đoạn 2: **hoàn thành ở local, chưa commit/push.**
+Trạng thái giai đoạn 1: **hoàn thành, đã đẩy lên fork (commit 82e68590).** Giai đoạn 2: **hoàn thành, đã đẩy lên fork (commit c68bf282).**
+Giai đoạn 3: **hoàn thành ở local, chưa commit/push** — từ giai đoạn này game mang thương hiệu riêng **Xung Kích 9X** (mục 6).
 
 ## 1. Hạ tầng tiếng Việt — file đã sửa
 
@@ -89,11 +90,103 @@ Kết luận: cả hai font đều hỗ trợ tiếng Việt đầy đủ, dấu
 
 - **Tin tức cũ:** 122 entry ngoài top 10 chưa có `title_vi`/`x_vi` (ở chế độ vi hiện fallback tiếng Anh). Dịch tiếp khi có nhu cầu; validate của `build.py` chỉ bắt buộc top 10.
 - **Chuỗi chưa qua `_t`:** báo cáo kết nối (`netdReport`, `src/09c-net.js`) và phần trang trí map cố ý giữ ngôn ngữ gốc theo thiết kế upstream (nằm trong `i18n/ignore.txt`).
-- **Trước khi public bản Việt hóa** — các mục `NOTICE.md` của upstream vẫn áp dụng: không dùng tên/logo "Riposte: Frontline" cho bản phân phối riêng, nhạc Suno chỉ phi thương mại, animation lính từ Mixamo không được phân phối rời, một số âm thanh CC BY phải ghi credit. Cần quyết định tên/logo riêng cho bản Việt (chưa làm trong giai đoạn 2 theo chỉ đạo).
+- **Trước khi public bản Việt hóa** — các mục `NOTICE.md` của upstream vẫn áp dụng. Tên/logo và nhạc Suno đã được xử lý ở giai đoạn 3 (mục 6); còn lại: animation lính từ Mixamo (mục 6.5) và một số âm thanh CC BY phải ghi credit.
 - Rà soát chất lượng dịch bởi người chơi thật (đặc biệt là các câu đùa mô tả map và văn pháp lý), và dịch nốt các chuỗi phát sinh khi upstream ra bản mới (chạy lại kiểm tra độ phủ khóa en/vi).
 
-## 6. Cách build lại
+## 6. Giai đoạn 3 (2026-11-27) — Đổi tên « Xung Kích 9X » và dọn thương hiệu
+
+Theo `NOTICE.md` của upstream, tên và logo « Riposte: Frontline » không thuộc MIT. Giai đoạn 3 cho fork một
+thương hiệu riêng: **Xung Kích 9X** — emblem tia sét vàng + số 9 trên nền tối, giữ tông vàng/đen của game gốc
+(màu nhấn `--xp: #F6C445`). Địa chỉ đích: `https://xung-kich-9x.vercel.app`; repo đích:
+`https://github.com/Bonbon2022/xung-kich-9x` (**user tự rename repo trên GitHub** — code đã trỏ sẵn về địa chỉ mới).
+
+### 6.1 Đổi tên trong source (chỉ sửa source, `dist/` do `build.py` sinh lại)
+
+- `build.py`: `SITE="https://xung-kich-9x.vercel.app"`; manifest PWA: `name`/`short_name` = « Xung Kích 9X »,
+  `description` tiếng Việt « FPS miễn phí trên trình duyệt: solo đấu bot hoặc online với bạn bè, không cần tải. »
+- `shell.html`: `lang="vi"`; apple-mobile-web-app-title, application-name, og:site_name, og:title, og:image:alt →
+  « Xung Kích 9X »; meta description + og:description → câu tiếng Việt của manifest; og:locale → `vi_VN`
+  (alternate `en_US`, `fr_FR`); JSON-LD (WebSite + VideoGame): `name` « Xung Kích 9X », **bỏ hẳn `alternateName`**,
+  `inLanguage: ["vi","en","fr"]`, description tiếng Việt; **xóa thẻ `google-site-verification`** của upstream;
+  3 thẻ `<h1 class="logo">` đổi `aria-label` → « Xung Kích 9X ».
+  Lưu ý về `<title>`: tiêu đề trang là một **khóa i18n** (chuỗi Pháp trong shell được dịch qua từ điển), nên tiêu đề
+  đổi thành « Xung Kích 9X, FPS gratuit dans le navigateur » và khóa tương ứng được đổi đồng bộ trong cả
+  `i18n/en.txt` lẫn `i18n/vi.txt` (giá trị: « Xung Kích 9X, free FPS in your browser » / « Xung Kích 9X, FPS miễn phí
+  ngay trong trình duyệt »). Đây là khóa duy nhất phải đổi tên ở giai đoạn này, vì chính chuỗi khóa chứa tên cũ.
+- `i18n/vi.txt` + `i18n/en.txt`: **chỉ đổi giá trị dịch** (sau `⇒`), không đổi khóa Pháp — 5 entry mỗi file:
+  văn điều khoản, tiêu đề trang, lời nhắc PWA, câu chào mừng, « Cài đặt Riposte » → « Cài đặt Xung Kích 9X » /
+  « Install Xung Kích 9X ». `tools/dev/check_i18n.py`: danh sách ngoại lệ `SHELL_SAME` đổi « Riposte: Frontline »
+  → « Xung Kích 9X » (tên riêng giữ nguyên mọi ngôn ngữ); kiểm tra lại **0 lỗi, 1.616/1.616**.
+- Chuỗi cứng trong `src/*.js`: nút mã nguồn (`09e-menus.js`) trỏ về `github.com/Bonbon2022/xung-kich-9x`;
+  `DECK_SITE` (`09ra-deck.js`) → domain mới; tiêu đề share/báo cáo trong `01a-gpu.js`, `09c-net.js` (kèm mục tương
+  ứng trong `i18n/ignore.txt`), dòng đầu file sao lưu tài khoản (`09j-compte.js`), đầu báo cáo hiệu năng
+  (`09zo-perfs.js`) → « Xung Kích 9X ».
+  **Giữ nguyên theo chủ ý:** khóa Pháp của `_t()` (giá trị dịch đã đổi; riêng chế độ tiếng Pháp vẫn hiện tên cũ vì
+  Pháp là ngôn ngữ nguồn của khóa — chấp nhận được, mặc định của fork là tiếng Việt), tiền tố PeerJS `cod-lc1-`,
+  tên localStorage, biến môi trường `RIPOSTE_LISIBLE`, comment tiếng Pháp, `changelog.json` lịch sử,
+  `assets/sfx/credits.json` (ghi công giọng nói), regex `PREVIEW_HOST`, `NOTICE.md` và `LICENSE` (văn bản pháp lý gốc).
+- `assets/deck/installer.sh`: `APP="Xung Kích 9X"`, `SITE` và URL curl trong comment → domain mới (đường dẫn kỹ
+  thuật `riposte-frontline` giữ nguyên).
+- `README.md` / `README.vi.md`: alt logo, tên game và link chơi → Xung Kích 9X + domain mới; **giữ** dòng ghi
+  nguồn fork từ BenDBSS/Riposte-Frontline-Source và trỏ `LICENSE`/`NOTICE.md`. `CONTRIBUTING.md` viết lại thành
+  ghi chú của fork (phát triển bản Việt hóa tại repo này), bỏ hướng dẫn cộng đồng playriposte.com.
+
+### 6.2 Logo và assets hình ảnh (tái tạo toàn bộ, đúng tên/kích thước gốc)
+
+Dựng bằng Python PIL, font **Saira Stencil One** (TTF tải từ google/fonts, có subset tiếng Việt), vàng gradient
+`#FFD76A → #F6C445 → #D9A41F`:
+
+- `assets/logo.webp` (1000×230, RGBA trong suốt như bản gốc) và `assets/deck/logo.png` (1000×230): emblem sét +
+  chữ « XUNG KÍCH 9X ».
+- `assets/icon/`: nền tối `#0E110D`, emblem sét + số 9 — `favicon.ico` (16/32/48 trong một file), `favicon-64.png`
+  (64, RGB), `favicon-96.png` (96), `apple-touch-icon.png` (180), `icon-192.png` (192), `icon-512.png` (512),
+  `maskable-192.png` / `maskable-512.png` (emblem thu về ~60% để nằm trong vùng an toàn maskable).
+- `assets/menu-bg.webp` (1916×821): key art mới do AI tạo ảnh sinh (lính đặc nhiệm hiện đại lúc hoàng hôn, tông
+  đen/vàng, không chữ); `assets/menu-depth.webp` (958×411) tạo lại từ key art mới (grayscale + blur) để parallax khớp.
+- `assets/apercu.jpg` (1200×630): key art + logo ngang + dòng « FPS miễn phí trong trình duyệt ».
+- `assets/deck/`: `capsule.jpg` (920×430), `hero.jpg` (1920×620), `jaquette.jpg` (600×900) — key art + logo;
+  `icone.png` (256×256) — emblem như bộ icon.
+
+### 6.3 Nhạc Suno — đã thay toàn bộ 4 file trong danh sách NOTICE
+
+- **Xóa `dist/menu-theme.mp3`** (ngoại lệ được sửa thẳng `dist/`: file này chỉ tồn tại ở `dist/`, `build.py` ghi
+  rõ vắng file = không nhạc menu; build sau khi xóa in « musique des menus : aucune », game chạy bình thường).
+- **Thay bằng bản tự tổng hợp** (Python tổng hợp sóng → WAV 48 kHz stereo → ffmpeg/libmp3lame MP3 thật):
+  `assets/sfx/fin/m_victory.mp3` (3,0 s, hợp âm Đô trưởng đi lên), `assets/sfx/fin/m_defeat.mp3` (3,0 s, nốt trầm
+  đi xuống), `assets/rankup.mp3` (1,1 s, quét đi lên). Các SFX khác (CC0/CC BY theo credits) giữ nguyên.
+
+### 6.4 Kiểm chứng giai đoạn 3
+
+- `python3 build.py`: **thành công** — manifest dist mang tên/description mới, `dist/` không còn `menu-theme.mp3`,
+  build xác nhận « musique des menus : aucune ».
+- `python3 tools/dev/check_i18n.py`: **0 lỗi** (1.616 khóa).
+- Grep rà soát « Riposte »/« playriposte » ở các vị trí người dùng thấy (shell, build, giá trị i18n, README):
+  chỉ còn ở các chỗ chấp nhận được — khóa Pháp của từ điển, lịch sử `changelog.json`, comment code, credits.json,
+  và câu ghi nguồn fork trong README/CONTRIBUTING.
+- Chromium headless (localhost, `dc_settings.lang='vi'`): tab « Xung Kích 9X, FPS miễn phí ngay trong trình
+  duyệt », màn hình tải và menu chính hiển thị logo mới trên key art mới, toàn bộ menu tiếng Việt
+  (ảnh: `/tmp/xk9x_menu.png` trong môi trường kiểm thử; CDN Google Fonts không tải được trong máy ảo nên chữ
+  menu dùng font dự phòng ở ảnh chụp — logo là ảnh nên hiện đúng).
+
+### 6.5 Tồn đọng sau giai đoạn 3
+
+- **Animation Mixamo (`assets/anim/clips.*`): giữ nguyên — chờ user bake lại từ tài khoản Mixamo của chính user
+  trước khi public chính thức.** Đây là hạng mục NOTICE duy nhất chưa dọn; không tự ý thay vì cần tài khoản
+  Mixamo cá nhân và kiểm chứng trực quan trong game.
+- **User cần tự rename repo** trên GitHub thành `xung-kich-9x` (code, README và nút mã nguồn trong game đã trỏ
+  sẵn về tên mới).
+- Placeholder pháp lý trong `src/09k-legal.js` (`LEGAL.name`, address, email) vẫn chưa điền — `build.py` cảnh báo
+  mỗi lần build; cần thông tin chủ thể của user trước khi production.
+- Chế độ tiếng Pháp vẫn hiện tên « Riposte: Frontline » ở vài chuỗi (Pháp là ngôn ngữ nguồn/khóa của i18n, xem
+  6.1) — nếu sau này muốn sạch tuyệt đối ở cả chế độ Pháp thì phải đổi khóa Pháp đồng bộ cả hai từ điển như đã
+  làm với khóa tiêu đề.
+
+## 7. Cách build lại
 
 ```bash
 python3 build.py   # sinh dist/riposte-frontline.html, đã nhúng cả I18N_EN và I18N_VI
 ```
+
+### Ghi chú kỹ thuật: đưa assets nhị phân lên GitHub (2026-11-27)
+
+Kênh đẩy file của Muse lên GitHub chỉ nhận file văn bản (UTF-8), nên 20 assets nhị phân mới (logo, icon, key art, ảnh deck, 3 file nhạc tự tổng hợp — tổng ~1,1MB) được lưu thêm dưới dạng mã hóa base64 trong `assets-b64/` (cấu trúc thư mục giống `assets/`, thêm đuôi `.b64`). Script `tools/restore_assets.py` giải mã chúng về `assets/` trước khi build; `vercel.json` đã cấu hình chạy script này tự động trước `build.py`, và đã kiểm chứng giải mã không làm thay đổi nội dung file (hash khớp). Hệ quả khi xem repo trên GitHub: các file trong `assets/` (logo.webp, icon…) vẫn là bản cũ của upstream cho tới khi có một lần commit trực tiếp bằng git — bản chạy trên Vercel vẫn đúng bản mới nhờ bước khôi phục. Khi nào tiện, chạy `git add -A && git commit` từ máy có clone đầy đủ rồi xóa `assets-b64/` + `tools/restore_assets.py` và đưa `buildCommand` trong vercel.json về `python3 build.py`.

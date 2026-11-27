@@ -1,7 +1,7 @@
 #!/bin/bash
-# Riposte: Frontline sur Steam Deck : installation dans Steam, en mode Bureau (README « Steam Deck »).
+# Xung Kích 9X sur Steam Deck : installation dans Steam, en mode Bureau (README « Steam Deck »).
 # Lancé par le fichier « Installer Riposte » que le jeu télécharge (bouton du menu principal sur Steam Deck), ou à la main :
-#   curl -fsSL https://www.playriposte.com/deck/installer.sh | bash
+#   curl -fsSL https://xung-kich-9x.vercel.app/deck/installer.sh | bash
 #   bash installer.sh [adresse du jeu] [--desinstaller]
 # Il installe Chrome (Flathub, pour l'utilisateur, sans mot de passe) et lui donne accès à la manette, écrit un lanceur qui ouvre le jeu en
 # ligne en plein écran (?deck=1 : mode Deck du jeu), ferme Steam, ajoute le raccourci (shortcuts.vdf) avec ses images (dossier grid) et la
@@ -10,7 +10,7 @@
 # sauvegarde à côté. Relancer l'installation remplace le raccourci au lieu d'en ajouter un. RIPOSTE_DECK_TEST=1 : sans Flatpak, sans
 # arrêt de Steam ni retour au mode Jeu (contrôle hors Steam Deck).
 set -u
-SITE="https://www.playriposte.com"
+SITE="https://xung-kich-9x.vercel.app"
 MODE=install
 for a in "$@"; do
   case "$a" in
@@ -20,7 +20,7 @@ for a in "$@"; do
 done
 # https seulement (http pour un essai sur cette machine : tools/dev/check_deck.py) : le lanceur et ce qu'il télécharge ne passent pas en clair
 if ! [[ "$SITE" =~ ^https://[A-Za-z0-9.:-]+$ || "$SITE" =~ ^http://(127\.0\.0\.1|localhost)(:[0-9]+)?$ ]]; then echo "Adresse invalide : $SITE"; exit 1; fi
-APP="Riposte: Frontline"
+APP="Xung Kích 9X"
 DIR="$HOME/.local/share/riposte-frontline"
 TEST="${RIPOSTE_DECK_TEST:-}"
 FR=; case "${LANG:-}${LC_ALL:-}" in fr*|*fr_*) FR=1 ;; esac
