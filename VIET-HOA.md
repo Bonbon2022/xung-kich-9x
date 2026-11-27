@@ -1,7 +1,7 @@
-# Việt hóa Riposte: Frontline — Giai đoạn 1 (hạ tầng i18n + từ điển tiếng Việt)
+# Việt hóa Riposte: Frontline — Giai đoạn 1 + 2 (hạ tầng i18n, từ điển, mặc định tiếng Việt, tin tức, README)
 
 Fork: `Bonbon2022/Riposte-Frontline-Source`, từ upstream `BenDBSS/Riposte-Frontline-Source` v5.6.0 (commit 31ca050d).
-Trạng thái giai đoạn 1: **hoàn thành ở local, chưa commit/push.**
+Trạng thái giai đoạn 1: **hoàn thành, đã đẩy lên fork (commit 82e68590).** Giai đoạn 2: **hoàn thành ở local, chưa commit/push.**
 
 ## 1. Hạ tầng tiếng Việt — file đã sửa
 
@@ -15,7 +15,7 @@ Trạng thái giai đoạn 1: **hoàn thành ở local, chưa commit/push.**
 | `src/09-game.js` | `ordinal()`: tiếng Việt không thêm hậu tố thứ hạng (tránh rơi vào hậu tố Pháp `1er`/`2e`). |
 | `src/09n-armurerie.js` | Định dạng số trong kho vũ khí dùng hằng `LOCALE` chung thay cho cặp `fr-FR`/`en-US` cứng (vi → `vi-VN`). |
 
-Cách chọn ngôn ngữ: Cài đặt trong game (Tùy chọn → Ngôn ngữ → Tiếng Việt), hoặc tự động khi ngôn ngữ trình duyệt đầu tiên khớp là tiếng Việt. Mặc định vẫn là tiếng Anh như upstream.
+Cách chọn ngôn ngữ: Cài đặt trong game (Tùy chọn → Ngôn ngữ → Tiếng Việt), hoặc tự động theo ngôn ngữ trình duyệt. Từ giai đoạn 2, **tiếng Việt là mặc định** khi trình duyệt không công bố vi/fr/en (xem mục 4).
 
 ## 2. Bảng thuật ngữ (nhất quán toàn bộ vi.txt)
 
@@ -47,15 +47,52 @@ Giọng dịch: tự nhiên theo cách nói của game thủ Việt; các mô t�
 - Harness Node mô phỏng `localStorage`/`navigator`: chọn thủ công `vi` → `LANG='vi'`, `LOCALE='vi-VN'`, `_t`/`_tn` dịch đúng, số định dạng kiểu Việt (`1.234.567`); trình duyệt `vi-VN` → tự chọn vi; `fr` đứng trước vi → vẫn chọn fr; ngôn ngữ lạ → về en.
 - **Kiểm chứng trực quan bằng headless Chromium (localhost):** đặt `dc_settings.lang='vi'`, menu chính hiển thị hoàn toàn bằng tiếng Việt — "Chơi / Lớp nhân vật / Trang phục / Tùy chọn / Có gì mới / Hồ sơ", tiêu đề tab: *"Riposte: Frontline, FPS miễn phí ngay trong trình duyệt"*, dấu tiếng Việt hiển thị đúng. (Trong môi trường kiểm thử, CDN PeerJS/Google Fonts không tải được do hạn chế mạng của máy ảo — không liên quan thay đổi này; ngoài đời thực tải bình thường.)
 
-## 4. Còn lại cho giai đoạn 2
+## 4. Giai đoạn 2 (2026-11-27) — mặc định tiếng Việt, tin tức, font, README
 
-- **Chuỗi chưa qua `_t`:** tin tức trong game (`src/09f-news.js`) chỉ có bản Pháp + Anh (`title_en`/`x_en`) — ở chế độ vi sẽ hiện tiếng Pháp; cần cơ chế `title_vi`/`x_vi` hoặc khóa từ điển riêng. Báo cáo kết nối (`netdReport`, `src/09c-net.js`) và phần trang trí map cố ý giữ ngôn ngữ gốc theo thiết kế upstream (nằm trong `i18n/ignore.txt`).
-- **README tiếng Việt** cho fork và ghi chú nguồn gốc bản dịch.
-- **Trước khi public bản Việt hóa** — các mục `NOTICE.md` của upstream vẫn áp dụng: không dùng tên/logo "Riposte: Frontline" cho bản phân phối riêng, nhạc Suno chỉ phi thương mại, animation lính từ Mixamo không được phân phối rời, một số âm thanh CC BY phải ghi credit. Cần quyết định tên/logo riêng cho bản Việt.
-- **Font:** game dùng font hiển thị tải từ Google Fonts (Saira/Saira Stencil) — dấu tiếng Việt ở menu/HUD hiển thị đúng qua font hệ thống dự phòng trong lần kiểm thử; nên kiểm tra lại trên trình duyệt thật có mạng, và cân nhắc bổ sung subset Vietnamese cho font hiển thị nếu có ký tự lỗi.
+### 4.1 Tiếng Việt là ngôn ngữ mặc định ưu tiên (`src/00-i18n.js`)
+
+- Chế độ tự động (chưa từng chọn thủ công): duyệt `navigator.languages`, gặp vi/fr/en đầu tiên thì dùng ngôn ngữ đó — như trước; **khi không gặp ngôn ngữ nào trong ba ngôn ngữ này, mặc định cuối cùng đổi từ `'en'` (upstream) thành `'vi'`**, vì fork này dành cho người Việt. Comment đầu file đã cập nhật cho khớp.
+- Lựa chọn thủ công đã lưu trong `dc_settings` (`en`/`fr`/`vi`) vẫn được tôn trọng tuyệt đối; trình duyệt công bố rõ tiếng Anh/Pháp vẫn vào en/fr.
+- Kiểm chứng bằng harness Node trên chính `src/00-i18n.js`: `de-DE` → **vi**; `vi-VN` → vi; `en-US` → en; `fr` đứng trước vi → fr; danh sách rỗng → vi; pref đã lưu `en` (dù trình duyệt là vi) → en; pref `fr` → fr; pref `vi` (dù trình duyệt là en) → vi. Trong bản build, đoạn mã đã rút gọn chứa `return'vi'`.
+
+### 4.2 Tin tức tiếng Việt (`changelog.json`, `src/09f-news.js`, `build.py`)
+
+- Đã thêm `x_vi` cho **50/50 thay đổi của 10 entry mới nhất** (5.6.0 → 4.22.0) và `title_vi` cho entry có tiêu đề trong nhóm này (5.0.0: « Tự chọn chuỗi hạ gục »). Entry major X.0.0 gần nhất (5.0.0, vị trí thứ 9) nằm sẵn trong top 10 nên không phải dịch thêm entry ngoài nhóm. Dịch thật từ Pháp + Anh, theo bảng thuật ngữ mục 2 (chuỗi hạ gục, hồi sinh, bản đồ nhỏ, Áo ghi lê vàng…).
+- `newsTitle`/`newsText`: ở `LANG==='vi'` ưu tiên `title_vi`/`x_vi`, thiếu thì lùi về bản Anh (`_en`), rồi mới tới bản Pháp. Các entry cũ hơn top 10 chưa có `_vi` nên ở chế độ vi sẽ hiện tiếng Anh (fallback mới) thay vì tiếng Pháp như giai đoạn 1.
+- `build.py`: bổ sung validate nhẹ cho tiếng Việt, **chỉ áp dụng cho 10 entry đầu**: entry có `title` thì phải có `title_vi`; change nào cũng phải có `x_vi` (đối xứng với validate `x_en`/`title_en` vốn áp dụng cho mọi entry). Không bắt buộc 122 entry còn lại.
+- Kiểm chứng trực quan bằng Chromium headless (localhost, `dc_settings.lang='vi'`): màn Tin tức (« Có gì mới ») hiển thị hoàn toàn tiếng Việt ở các entry mới nhất — thẻ MỚI / CẢI TIẾN / ĐÃ SỬA, ngày kiểu « 25 tháng 10, 2026 », dòng tóm tắt « Phiên bản hiện tại: 5.6.0. 10 bản cập nhật gần nhất. » (ảnh: `/tmp/vi_news.png` trong môi trường kiểm thử).
+
+### 4.3 Font hiển thị — đã xác minh, **không cần thay font**
+
+Kiểm chứng bằng hai nguồn độc lập: `METADATA.pb` trong kho `google/fonts` và CSS API trực tiếp của Google Fonts (`css2`, có block `/* vietnamese */`):
+
+| Font | Vai trò | Subset vietnamese |
+|---|---|---|
+| Saira Stencil One | `--stencil` (tiêu đề) | **Có** (`subsets: "vietnamese"` trong `ofl/sairastencilone/METADATA.pb`; css2 trả về block vietnamese) |
+| Barlow Condensed | `--hud` (giao diện) | **Có** (`ofl/barlowcondensed/METADATA.pb`; css2 trả về block vietnamese cho cả 4 trọng lượng 400–700) |
+
+Kết luận: cả hai font đều hỗ trợ tiếng Việt đầy đủ, dấu tiếng Việt ở tiêu đề lớn và HUD hiển thị bằng font thật, không rơi về font dự phòng — **không cần thêm Bungee/Be Vietnam Pro và không sửa `shell.html`**. (Lưu ý: máy ảo kiểm thử không tải được CDN Google Fonts nên ảnh chụp local dùng font dự phòng; kết luận dựa trên metadata + CSS API chính thức ở trên.)
+
+### 4.4 README tiếng Việt
+
+- Tạo mới `README.vi.md`: dịch trung thực `README.md` (giới thiệu, nội dung, build & chơi, tổ chức code) + mục **Ngôn ngữ** và mục riêng **Bản Việt hóa này (fork)**: tiếng Việt là mặc định, cách đổi ngôn ngữ trong Tùy chọn → Trò chơi → Ngôn ngữ, độ phủ bản dịch, và tóm tắt giấy phép dẫn về `LICENSE`/`NOTICE.md` (chỉ tóm tắt + dẫn link, không thay thế văn bản gốc).
+- `README.md`: thêm 2 dòng ở đầu trỏ tới `README.vi.md`. Không sửa nội dung khác.
+
+### 4.5 Kiểm chứng giai đoạn 2
+
+- `python3 build.py`: **thành công** (validate changelog mới đạt); `dist/riposte-frontline.html` chứa `x_vi`/`title_vi` và logic mặc định `return'vi'`.
+- `python3 tools/dev/check_i18n.py`: **0 lỗi** (1.616 khóa Anh, 1.616 khóa cần dịch).
+- `changelog.json`: `json.load` hợp lệ, 132 entry; độ phủ `_vi` trong top 10: 50/50 change + 1/1 title.
+- Chromium headless: `LANG='vi'`, tiêu đề tab tiếng Việt, màn Tin tức tiếng Việt (mục 4.2). Trường hợp trình duyệt công bố ngôn ngữ lạ (de-DE) không mô phỏng được trong Chromium headless của máy ảo (cờ `--lang` và `Emulation.setLocaleOverride` đều bị bỏ qua, trình duyệt vẫn công bố en-US) — trường hợp này đã được harness Node bao phủ (mục 4.1).
+
+## 5. Còn lại sau giai đoạn 2
+
+- **Tin tức cũ:** 122 entry ngoài top 10 chưa có `title_vi`/`x_vi` (ở chế độ vi hiện fallback tiếng Anh). Dịch tiếp khi có nhu cầu; validate của `build.py` chỉ bắt buộc top 10.
+- **Chuỗi chưa qua `_t`:** báo cáo kết nối (`netdReport`, `src/09c-net.js`) và phần trang trí map cố ý giữ ngôn ngữ gốc theo thiết kế upstream (nằm trong `i18n/ignore.txt`).
+- **Trước khi public bản Việt hóa** — các mục `NOTICE.md` của upstream vẫn áp dụng: không dùng tên/logo "Riposte: Frontline" cho bản phân phối riêng, nhạc Suno chỉ phi thương mại, animation lính từ Mixamo không được phân phối rời, một số âm thanh CC BY phải ghi credit. Cần quyết định tên/logo riêng cho bản Việt (chưa làm trong giai đoạn 2 theo chỉ đạo).
 - Rà soát chất lượng dịch bởi người chơi thật (đặc biệt là các câu đùa mô tả map và văn pháp lý), và dịch nốt các chuỗi phát sinh khi upstream ra bản mới (chạy lại kiểm tra độ phủ khóa en/vi).
 
-## 5. Cách build lại
+## 6. Cách build lại
 
 ```bash
 python3 build.py   # sinh dist/riposte-frontline.html, đã nhúng cả I18N_EN và I18N_VI

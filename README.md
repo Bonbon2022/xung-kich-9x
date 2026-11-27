@@ -1,5 +1,7 @@
 <h1 align="center"><img src="assets/logo.webp" alt="Riposte: Frontline" width="640"></h1>
 
+🇻🇳 Tiếng Việt: [README.vi.md](README.vi.md) — bản Việt hóa của fork này, tiếng Việt là ngôn ngữ mặc định.
+
 **Riposte: Frontline** is a free first-person shooter played in the browser, on desktop and on phones, in the spirit of modern
 Call of Duty games: https://www.playriposte.com
 

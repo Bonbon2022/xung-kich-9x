@@ -6,17 +6,20 @@
       {
         "t": "new",
         "x": "Le code source du jeu est public, sous licence MIT. Le lien \"Code source\" en bas du menu principal y mène, chacun peut le lire et s'en servir pour ses propres jeux.",
-        "x_en": "The game's source code is public, under the MIT license. The \"Source code\" link at the bottom of the main menu leads to it, and anyone can read it and use it for their own games."
+        "x_en": "The game's source code is public, under the MIT license. The \"Source code\" link at the bottom of the main menu leads to it, and anyone can read it and use it for their own games.",
+        "x_vi": "Mã nguồn của game đã được công khai theo giấy phép MIT. Liên kết \"Mã nguồn\" ở cuối menu chính dẫn tới đó, ai cũng có thể đọc và dùng cho game của riêng mình."
       },
       {
         "t": "fixed",
         "x": "Après une mort aux commandes du drone kamikaze ou dans un mecha, on réapparaît avec son arme en main.",
-        "x_en": "After dying while flying the kamikaze drone or inside a mech, you now respawn with your weapon in hand."
+        "x_en": "After dying while flying the kamikaze drone or inside a mech, you now respawn with your weapon in hand.",
+        "x_vi": "Sau khi chết trong lúc điều khiển drone kamikaze hoặc ở trong mecha, giờ bạn sẽ hồi sinh với vũ khí trên tay."
       },
       {
         "t": "fixed",
         "x": "Le gilet de la tenue Gilet jaune ne rentre plus dans le corps du soldat.",
-        "x_en": "The vest of the Gilet jaune outfit no longer clips into the soldier's body."
+        "x_en": "The vest of the Gilet jaune outfit no longer clips into the soldier's body.",
+        "x_vi": "Áo của trang phục Áo ghi lê vàng không còn bị lẹm vào thân người lính nữa."
       }
     ]
   },
@@ -27,37 +30,44 @@
       {
         "t": "new",
         "x": "Nouveau plafond d'images par seconde, \"Moitié de l'écran\". Le jeu dessine une image tous les deux rafraîchissements, pour une cadence régulière (140 images par seconde sur un écran de 280 Hz).",
-        "x_en": "New frame rate cap, \"Half refresh rate\". The game draws one frame every two screen refreshes, for an even pace (140 frames per second on a 280 Hz screen)."
+        "x_en": "New frame rate cap, \"Half refresh rate\". The game draws one frame every two screen refreshes, for an even pace (140 frames per second on a 280 Hz screen).",
+        "x_vi": "Thêm giới hạn khung hình mới: \"Nửa tần số quét\". Game vẽ một khung hình sau mỗi hai lần quét màn hình để nhịp độ đều đặn (140 khung hình/giây trên màn hình 280 Hz)."
       },
       {
         "t": "new",
         "x": "Rapport de performances dans Options, Vidéo. Avec l'affichage des performances, il suit chaque image d'une partie et se copie à la fin pour comprendre les chutes d'images.",
-        "x_en": "Performance report in Options, Video. With the performance display on, it tracks every frame of a match and can be copied at the end to understand frame drops."
+        "x_en": "Performance report in Options, Video. With the performance display on, it tracks every frame of a match and can be copied at the end to understand frame drops.",
+        "x_vi": "Báo cáo hiệu năng trong Tùy chọn, mục Video. Khi bật hiển thị hiệu năng, báo cáo theo dõi từng khung hình của một trận và có thể sao chép lại sau trận để tìm hiểu nguyên nhân tụt khung hình."
       },
       {
         "t": "improved",
         "x": "Les grenades flash, les couteaux de lancer, les coups de couteau et le drone kamikaze affichent une croix de touche quand ils atteignent un ennemi.",
-        "x_en": "Flashbangs, throwing knives, knife hits and the kamikaze drone now show a hit marker when they reach an enemy."
+        "x_en": "Flashbangs, throwing knives, knife hits and the kamikaze drone now show a hit marker when they reach an enemy.",
+        "x_vi": "Lựu đạn choáng, dao ném, đòn dao và drone kamikaze giờ hiển thị dấu hiệu trúng đích khi chạm tới kẻ địch."
       },
       {
         "t": "improved",
         "x": "Le drone kamikaze a un vrai bruit d'hélices, qui monte avec sa vitesse.",
-        "x_en": "The kamikaze drone has a real propeller sound, which rises with its speed."
+        "x_en": "The kamikaze drone has a real propeller sound, which rises with its speed.",
+        "x_vi": "Drone kamikaze có tiếng cánh quạt thật, cao dần theo tốc độ của nó."
       },
       {
         "t": "improved",
         "x": "Moins de ralentissements après une explosion au milieu des caisses et des objets du décor, surtout sur Kervénec.",
-        "x_en": "Fewer slowdowns after an explosion among crates and props, especially on Kervénec."
+        "x_en": "Fewer slowdowns after an explosion among crates and props, especially on Kervénec.",
+        "x_vi": "Ít giật lag hơn sau một vụ nổ giữa các thùng và vật trang trí, nhất là ở Kervénec."
       },
       {
         "t": "improved",
         "x": "En domination, la mini-carte demande beaucoup moins de calcul et les points ne causent plus d'à-coup au début de la partie.",
-        "x_en": "In Domination, the minimap takes far less work and the capture points no longer cause a stutter at the start of the match."
+        "x_en": "In Domination, the minimap takes far less work and the capture points no longer cause a stutter at the start of the match.",
+        "x_vi": "Ở chế độ Chiếm đóng, bản đồ nhỏ tốn ít sức tính toán hơn nhiều và các điểm chiếm không còn gây khựng hình lúc đầu trận."
       },
       {
         "t": "fixed",
         "x": "Une élimination au couteau de lancer ne compte plus deux fois dans les enchaînements d'éliminations.",
-        "x_en": "A throwing knife kill no longer counts twice in kill chains."
+        "x_en": "A throwing knife kill no longer counts twice in kill chains.",
+        "x_vi": "Một mạng hạ gục bằng dao ném không còn bị tính hai lần trong các chuỗi hạ gục liên tiếp."
       }
     ]
   },
@@ -68,12 +78,14 @@
       {
         "t": "new",
         "x": "Nouvelle tenue de défi, Gilet jaune. Elle se gagne sur les cartes françaises, Val-Blanc, Kervénec et French Dream.",
-        "x_en": "New challenge outfit, Yellow Vest. Unlock it on the French maps, Val-Blanc, Kervénec and French Dream."
+        "x_en": "New challenge outfit, Yellow Vest. Unlock it on the French maps, Val-Blanc, Kervénec and French Dream.",
+        "x_vi": "Trang phục thử thách mới: Áo ghi lê vàng. Mở khóa trên các bản đồ Pháp: Val-Blanc, Kervénec và French Dream."
       },
       {
         "t": "fixed",
         "x": "Les bots éblouis par une grenade flash ne restent plus aveugles à la partie suivante. Ils restaient au point d'apparition à tituber sans tirer, surtout en ligne.",
-        "x_en": "Bots blinded by a flashbang no longer stay blind in the next match. They used to stagger at their spawn without shooting, mostly online."
+        "x_en": "Bots blinded by a flashbang no longer stay blind in the next match. They used to stagger at their spawn without shooting, mostly online.",
+        "x_vi": "Bot bị lựu đạn choáng làm mù không còn bị mù sang tận trận sau. Trước đây chúng cứ lảo đảo ở điểm hồi sinh mà không bắn, nhất là khi chơi trực tuyến."
       }
     ]
   },
@@ -84,17 +96,20 @@
       {
         "t": "improved",
         "x": "Les cartes ont de nouvelles descriptions.",
-        "x_en": "Maps have new descriptions."
+        "x_en": "Maps have new descriptions.",
+        "x_vi": "Các bản đồ có mô tả mới."
       },
       {
         "t": "improved",
         "x": "Les descriptions des armes, des grenades, des classes, des séries, des accessoires et des modes sont plus courtes.",
-        "x_en": "Descriptions of weapons, grenades, classes, killstreaks, attachments and modes are shorter."
+        "x_en": "Descriptions of weapons, grenades, classes, killstreaks, attachments and modes are shorter.",
+        "x_vi": "Mô tả của vũ khí, lựu đạn, lớp nhân vật, chuỗi hạ gục, phụ kiện và chế độ chơi đã được rút ngắn."
       },
       {
         "t": "improved",
         "x": "L'écran de chargement d'une partie n'affiche plus d'astuce.",
-        "x_en": "The match loading screen no longer shows a tip."
+        "x_en": "The match loading screen no longer shows a tip.",
+        "x_vi": "Màn hình tải trận không còn hiển thị mẹo chơi nữa."
       }
     ]
   },
@@ -105,42 +120,50 @@
       {
         "t": "new",
         "x": "Un bouton Jouer remplace Solo et Multijoueur. On y choisit de jouer seul contre des bots, entre amis ou dans une partie publique.",
-        "x_en": "A Play button replaces Solo and Multiplayer. Pick whether to play alone against bots, with friends or in a public match."
+        "x_en": "A Play button replaces Solo and Multiplayer. Pick whether to play alone against bots, with friends or in a public match.",
+        "x_vi": "Một nút Chơi duy nhất thay cho Chơi đơn và Nhiều người chơi. Tại đó bạn chọn chơi một mình với bot, chơi cùng bạn bè hoặc vào một trận công khai."
       },
       {
         "t": "new",
         "x": "Nouveau menu Amis. On y voit ses amis connectés et ce qu'ils font, et on les invite dans son salon d'un toucher. L'invitation apparaît chez eux, ils rejoignent sans taper de code.",
-        "x_en": "New Friends menu. See which friends are online and what they are doing, and invite them to your lobby in one tap. The invite pops up on their screen and they join without typing a code."
+        "x_en": "New Friends menu. See which friends are online and what they are doing, and invite them to your lobby in one tap. The invite pops up on their screen and they join without typing a code.",
+        "x_vi": "Menu Bạn bè mới. Xem bạn bè nào đang trực tuyến và đang làm gì, rồi mời họ vào phòng chờ của bạn chỉ bằng một chạm. Lời mời hiện ngay trên màn hình của họ và họ tham gia không cần nhập mã."
       },
       {
         "t": "improved",
         "x": "Parties publiques ne montre plus que les salons publics lancés par des joueurs, et seulement ceux où il y a du monde.",
-        "x_en": "Public matches now only lists public lobbies started by players, and only the ones with people in them."
+        "x_en": "Public matches now only lists public lobbies started by players, and only the ones with people in them.",
+        "x_vi": "Mục Trận công khai giờ chỉ liệt kê các phòng chờ công khai do người chơi mở, và chỉ những phòng đang có người."
       },
       {
         "t": "improved",
         "x": "La killcam montre les touches du tueur, avec leur son.",
-        "x_en": "The killcam now shows the killer's hit markers, with their sound."
+        "x_en": "The killcam now shows the killer's hit markers, with their sound.",
+        "x_vi": "Killcam giờ hiển thị cả các dấu hiệu trúng đích của kẻ đã hạ bạn, kèm âm thanh của chúng."
       },
       {
         "t": "improved",
         "x": "Les boutons du haut du menu principal n'affichent plus que leur icône, sur ordinateur comme sur téléphone.",
-        "x_en": "The buttons at the top of the main menu now only show their icon, on computer as on phone."
+        "x_en": "The buttons at the top of the main menu now only show their icon, on computer as on phone.",
+        "x_vi": "Các nút ở phía trên menu chính giờ chỉ hiển thị biểu tượng, trên máy tính cũng như điện thoại."
       },
       {
         "t": "fixed",
         "x": "En ligne, les bots ne restent plus figés quand le joueur qui héberge la partie passe sur un autre onglet.",
-        "x_en": "Online, bots no longer freeze when the player hosting the match switches to another tab."
+        "x_en": "Online, bots no longer freeze when the player hosting the match switches to another tab.",
+        "x_vi": "Khi chơi trực tuyến, bot không còn bị đơ khi người chơi chủ trì trận đấu chuyển sang tab khác."
       },
       {
         "t": "fixed",
         "x": "La killcam d'un pilote de mecha montre la cabine, sans les bras et l'arme du soldat par-dessus.",
-        "x_en": "The killcam of a mecha pilot shows the cockpit, without the soldier's arms and weapon on top of it."
+        "x_en": "The killcam of a mecha pilot shows the cockpit, without the soldier's arms and weapon on top of it.",
+        "x_vi": "Killcam của phi công mecha hiển thị buồng lái, không còn tay và vũ khí của người lính chồng lên trên."
       },
       {
         "t": "fixed",
         "x": "Avec une manette, sur Steam Deck notamment, le dégradé du bas de l'écran descend jusqu'au bord.",
-        "x_en": "With a controller, on Steam Deck in particular, the shading at the bottom of the screen now reaches the edge."
+        "x_en": "With a controller, on Steam Deck in particular, the shading at the bottom of the screen now reaches the edge.",
+        "x_vi": "Khi dùng tay cầm, đặc biệt trên Steam Deck, lớp tối dần ở cuối màn hình giờ kéo dài tới tận mép."
       }
     ]
   },
@@ -151,12 +174,14 @@
       {
         "t": "fixed",
         "x": "Recharger en courant ne couche plus l'arme en travers de l'écran. Elle garde la pose du rechargement, un peu plus bas, et ne gêne plus la visée.",
-        "x_en": "Reloading while sprinting no longer swings the weapon across the screen. It keeps its reload pose, a little lower, and stays out of your aim."
+        "x_en": "Reloading while sprinting no longer swings the weapon across the screen. It keeps its reload pose, a little lower, and stays out of your aim.",
+        "x_vi": "Nạp đạn trong lúc chạy nước rút không còn vung vũ khí ngang qua màn hình. Vũ khí giữ nguyên tư thế nạp đạn, thấp hơn một chút, và không còn che tầm ngắm."
       },
       {
         "t": "fixed",
         "x": "L'arme reprend sa pose de course quand on sprinte. Elle restait à la hanche depuis la 5.2.0.",
-        "x_en": "The weapon goes back to its sprint pose when you sprint. It had stayed at the hip since 5.2.0."
+        "x_en": "The weapon goes back to its sprint pose when you sprint. It had stayed at the hip since 5.2.0.",
+        "x_vi": "Vũ khí trở lại tư thế chạy khi bạn chạy nước rút. Nó đã bị kẹt ở hông kể từ bản 5.2.0."
       }
     ]
   },
@@ -167,27 +192,32 @@
       {
         "t": "new",
         "x": "Nouvelle carte, French Dream. Un lotissement de province où toutes les maisons se ressemblent, la plus petite carte du jeu, faite pour le combat rapproché. Le chantier, la maison témoin et son étage, la raquette et des jardins fermés de thuyas.",
-        "x_en": "New map, French Dream. A small-town housing estate where every house looks the same, the smallest map in the game, built for close combat. The building site, the show home and its upper floor, the cul-de-sac and gardens closed off by hedges."
+        "x_en": "New map, French Dream. A small-town housing estate where every house looks the same, the smallest map in the game, built for close combat. The building site, the show home and its upper floor, the cul-de-sac and gardens closed off by hedges.",
+        "x_vi": "Bản đồ mới: French Dream. Một khu dân cư tỉnh lẻ nơi mọi ngôi nhà đều giống hệt nhau, bản đồ nhỏ nhất của game, sinh ra cho cận chiến. Công trường xây dựng, nhà mẫu và tầng trên của nó, ngõ cụt và những khu vườn khép kín sau hàng rào cây."
       },
       {
         "t": "improved",
         "x": "Le jeu est plus nerveux. On court, glisse, change d'arme, recharge et vise plus vite, et les animations des armes sont plus franches.",
-        "x_en": "The game is snappier. Running, sliding, switching weapons, reloading and aiming are all faster, and weapon animations hit harder."
+        "x_en": "The game is snappier. Running, sliding, switching weapons, reloading and aiming are all faster, and weapon animations hit harder.",
+        "x_vi": "Game nhanh và gắt hơn. Chạy, trượt, đổi vũ khí, nạp đạn và ngắm bắn đều nhanh hơn, còn hoạt ảnh vũ khí thì dứt khoát hơn."
       },
       {
         "t": "improved",
         "x": "Les voitures ont été refaites. Formes arrondies, vitres placées comme sur de vraies voitures, peinture brillante et roues plus grandes. Le 4x4 et le camion militaire aussi.",
-        "x_en": "Cars have been remade. Rounded shapes, windows laid out like on real cars, glossy paint and bigger wheels. The 4x4 and the army truck too."
+        "x_en": "Cars have been remade. Rounded shapes, windows laid out like on real cars, glossy paint and bigger wheels. The 4x4 and the army truck too.",
+        "x_vi": "Xe cộ đã được làm lại. Dáng bo tròn, kính đặt như trên xe thật, sơn bóng và bánh xe lớn hơn. Xe 4x4 và xe tải quân sự cũng vậy."
       },
       {
         "t": "improved",
         "x": "Les véhicules ont de vraies vitres. On voit l'habitacle à travers, et les balles passent.",
-        "x_en": "Vehicles have real windows. You can see the interior through them, and bullets go through."
+        "x_en": "Vehicles have real windows. You can see the interior through them, and bullets go through.",
+        "x_vi": "Xe cộ có kính thật. Nhìn xuyên qua được khoang lái, và đạn cũng bay xuyên qua."
       },
       {
         "t": "fixed",
         "x": "Sauter sur un canapé ou une table sous un plafond bas ne projette plus le personnage à l'autre bout de la pièce.",
-        "x_en": "Jumping onto a sofa or a table under a low ceiling no longer throws your character to the other side of the room."
+        "x_en": "Jumping onto a sofa or a table under a low ceiling no longer throws your character to the other side of the room.",
+        "x_vi": "Nhảy lên ghế sofa hoặc bàn dưới trần thấp không còn hất nhân vật sang đầu kia của phòng nữa."
       }
     ]
   },
@@ -198,47 +228,56 @@
       {
         "t": "new",
         "x": "Choisissez l'équipement de chaque classe dans l'atelier. Grenade à fragmentation, grenade flash, fumigène ou couteau de lancer, deux à chaque vie.",
-        "x_en": "Pick each class's equipment in the class workshop. Frag grenade, flashbang, smoke grenade or throwing knife, two every life."
+        "x_en": "Pick each class's equipment in the class workshop. Frag grenade, flashbang, smoke grenade or throwing knife, two every life.",
+        "x_vi": "Chọn trang bị cho từng lớp nhân vật trong xưởng lớp. Lựu đạn nổ, lựu đạn choáng, lựu đạn khói hoặc dao ném, mỗi mạng mang theo hai món."
       },
       {
         "t": "new",
         "x": "Grenade flash. Elle aveugle et assourdit ceux qui la regardent, d'autant plus fort et longtemps qu'ils sont près. Elle ne blesse personne.",
-        "x_en": "Flashbang. It blinds and deafens whoever looks at it, harder and longer the closer they are. It hurts no one."
+        "x_en": "Flashbang. It blinds and deafens whoever looks at it, harder and longer the closer they are. It hurts no one.",
+        "x_vi": "Lựu đạn choáng. Nó làm mù và điếc bất cứ ai nhìn vào nó, càng gần thì càng mạnh và càng lâu. Nó không làm ai bị thương."
       },
       {
         "t": "new",
         "x": "Fumigène. Il ouvre un nuage d'environ sept mètres pendant une quinzaine de secondes. Personne ne voit à travers, les bots non plus.",
-        "x_en": "Smoke grenade. It opens a cloud about seven meters wide for around fifteen seconds. No one sees through it, bots included."
+        "x_en": "Smoke grenade. It opens a cloud about seven meters wide for around fifteen seconds. No one sees through it, bots included.",
+        "x_vi": "Lựu đạn khói. Nó tạo một đám mây rộng khoảng bảy mét trong chừng mười lăm giây. Không ai nhìn xuyên qua được, kể cả bot."
       },
       {
         "t": "new",
         "x": "Couteau de lancer. Il part tout droit vers le réticule et tue d'un coup. Raté, il reste planté et se ramasse en passant dessus.",
-        "x_en": "Throwing knife. It flies straight at the crosshair and kills in one hit. If you miss, it stays stuck and you pick it up by walking over it."
+        "x_en": "Throwing knife. It flies straight at the crosshair and kills in one hit. If you miss, it stays stuck and you pick it up by walking over it.",
+        "x_vi": "Dao ném. Nó bay thẳng theo tâm ngắm và hạ gục trong một đòn. Ném trượt, nó cắm lại đó và bạn nhặt lại bằng cách đi qua."
       },
       {
         "t": "improved",
         "x": "Les grenades ont plus de poids. Courbe plus lourde, rebonds plus vifs, et elles ne dérivent plus quand on se déplace de côté en les lançant.",
-        "x_en": "Grenades feel heavier. A weightier arc, livelier bounces, and they no longer drift when you strafe while throwing."
+        "x_en": "Grenades feel heavier. A weightier arc, livelier bounces, and they no longer drift when you strafe while throwing.",
+        "x_vi": "Lựu đạn có sức nặng hơn. Đường bay nặng hơn, nảy sống động hơn, và chúng không còn bị lệch khi bạn vừa di chuyển ngang vừa ném."
       },
       {
         "t": "new",
         "x": "La trajectoire de la grenade s'affiche quand on la tient. On peut la couper dans Options, onglet Jeu, rubrique Interface.",
-        "x_en": "The grenade's path now shows while you hold it. You can turn it off in Options, Game tab, Interface section."
+        "x_en": "The grenade's path now shows while you hold it. You can turn it off in Options, Game tab, Interface section.",
+        "x_vi": "Đường bay của lựu đạn hiển thị trong lúc bạn cầm nó. Có thể tắt trong Tùy chọn, tab Trò chơi, mục Giao diện."
       },
       {
         "t": "improved",
         "x": "Seule la grenade à fragmentation se cuit en main. La flash et le fumigène se tiennent sans risque et partent au lancer.",
-        "x_en": "Only the frag grenade can be cooked. Flashbangs and smoke grenades are safe to hold and only start when thrown."
+        "x_en": "Only the frag grenade can be cooked. Flashbangs and smoke grenades are safe to hold and only start when thrown.",
+        "x_vi": "Chỉ lựu đạn nổ mới \"nấu\" được trên tay. Lựu đạn choáng và lựu đạn khói cầm an toàn, chỉ bắt đầu khi đã ném đi."
       },
       {
         "t": "improved",
         "x": "L'atelier de classe montre en haut les quatre emplacements de la classe, avec ce qui est équipé dans chacun.",
-        "x_en": "The class workshop now shows the class's four slots at the top, with what is equipped in each."
+        "x_en": "The class workshop now shows the class's four slots at the top, with what is equipped in each.",
+        "x_vi": "Xưởng lớp giờ hiển thị ở phía trên bốn ô của lớp nhân vật, kèm những gì đang trang bị trong từng ô."
       },
       {
         "t": "improved",
         "x": "Le mecha piloté frappe plus fort, ses obus éclatent à l'impact. En face, les bots viennent le combattre au lieu de le fuir.",
-        "x_en": "The piloted mecha hits harder and its shells burst on impact. Bots now come to fight it instead of running away."
+        "x_en": "The piloted mecha hits harder and its shells burst on impact. Bots now come to fight it instead of running away.",
+        "x_vi": "Mecha do người lái đánh mạnh hơn, đạn pháo nổ ngay khi chạm. Ở phía đối diện, bot giờ lao tới đánh nó thay vì bỏ chạy."
       }
     ]
   },
@@ -247,46 +286,55 @@
     "date": "2026-10-22",
     "title": "Séries d'éliminations au choix",
     "title_en": "Pick your killstreaks",
+    "title_vi": "Tự chọn chuỗi hạ gục",
     "changes": [
       {
         "t": "new",
         "x": "Séries d'éliminations au choix. Chaque classe en emporte trois, à trois seuils différents, à régler dans le nouvel onglet Séries de l'atelier.",
-        "x_en": "Pick your killstreaks. Each class takes three, at three different thresholds, set in the new Killstreaks tab of the class workshop."
+        "x_en": "Pick your killstreaks. Each class takes three, at three different thresholds, set in the new Killstreaks tab of the class workshop.",
+        "x_vi": "Tự chọn chuỗi hạ gục. Mỗi lớp nhân vật mang theo ba chuỗi, ở ba ngưỡng khác nhau, chỉnh trong tab Chuỗi hạ gục mới của xưởng lớp."
       },
       {
         "t": "new",
         "x": "Mecha, à 13 éliminations. Il tombe du ciel sur la zone choisie à la tablette et mitraille les ennemis autour de lui. Approchez-vous pour monter à bord et le piloter. Il chauffe avec le temps et sous les tirs, sortez avant qu'il explose.",
-        "x_en": "Mecha, at 13 kills. It drops from the sky on the zone you pick on the tablet and guns down enemies around it. Walk up to it to climb aboard and pilot it. It heats up over time and under fire, so get out before it blows up."
+        "x_en": "Mecha, at 13 kills. It drops from the sky on the zone you pick on the tablet and guns down enemies around it. Walk up to it to climb aboard and pilot it. It heats up over time and under fire, so get out before it blows up.",
+        "x_vi": "Mecha, ở 13 mạng hạ gục. Nó rơi từ trời xuống khu vực bạn chọn trên máy tính bảng và xả đạn vào kẻ địch xung quanh. Hãy đến gần để leo lên lái. Nó nóng dần theo thời gian và khi trúng đạn, hãy ra ngoài trước khi nó phát nổ."
       },
       {
         "t": "new",
         "x": "Drone kamikaze, à 6 éliminations. Vous le pilotez jusqu'à 30 secondes et il explose sur l'ennemi. Votre corps reste sur place, sans défense.",
-        "x_en": "Kamikaze drone, at 6 kills. You fly it for up to 30 seconds and it blows up on the enemy. Your body stays put, defenseless."
+        "x_en": "Kamikaze drone, at 6 kills. You fly it for up to 30 seconds and it blows up on the enemy. Your body stays put, defenseless.",
+        "x_vi": "Drone kamikaze, ở 6 mạng hạ gục. Bạn lái nó tối đa 30 giây và nó phát nổ trên kẻ địch. Thân người của bạn ở yên tại chỗ, không có gì phòng thủ."
       },
       {
         "t": "new",
         "x": "IEM, à 8 éliminations. Elle brouille l'équipe adverse pendant 25 secondes. Sa mini-carte ne montre plus rien et ses séries ne s'appellent plus.",
-        "x_en": "EMP, at 8 kills. It jams the enemy team for 25 seconds. Their minimap goes blank and their killstreaks can't be called."
+        "x_en": "EMP, at 8 kills. It jams the enemy team for 25 seconds. Their minimap goes blank and their killstreaks can't be called.",
+        "x_vi": "EMP, ở 8 mạng hạ gục. Nó gây nhiễu đội đối phương trong 25 giây. Bản đồ nhỏ của họ trống trơn và không gọi được chuỗi hạ gục."
       },
       {
         "t": "new",
         "x": "Satellite, à 10 éliminations. Il montre les ennemis en direct sur la mini-carte pendant 30 secondes.",
-        "x_en": "Satellite, at 10 kills. It shows enemies live on the minimap for 30 seconds."
+        "x_en": "Satellite, at 10 kills. It shows enemies live on the minimap for 30 seconds.",
+        "x_vi": "Vệ tinh, ở 10 mạng hạ gục. Nó hiển thị kẻ địch trực tiếp trên bản đồ nhỏ trong 30 giây."
       },
       {
         "t": "improved",
         "x": "L'UAV relève la position des ennemis toutes les 3 secondes, comme un sonar. Chacun apparaît sur la mini-carte au passage de l'onde, puis s'efface.",
-        "x_en": "The UAV now scans enemy positions every 3 seconds, like a sonar. Each one shows up on the minimap as the wave passes, then fades."
+        "x_en": "The UAV now scans enemy positions every 3 seconds, like a sonar. Each one shows up on the minimap as the wave passes, then fades.",
+        "x_vi": "UAV giờ quét vị trí kẻ địch mỗi 3 giây, như một sonar. Mỗi kẻ địch hiện lên trên bản đồ nhỏ khi sóng quét qua, rồi mờ dần."
       },
       {
         "t": "new",
         "x": "Des annonces radio pour les nouvelles séries, en français et en anglais.",
-        "x_en": "Radio callouts for the new killstreaks, in English and French."
+        "x_en": "Radio callouts for the new killstreaks, in English and French.",
+        "x_vi": "Các thông báo radio cho những chuỗi hạ gục mới, bằng tiếng Pháp và tiếng Anh."
       },
       {
         "t": "improved",
         "x": "Les bots se servent eux aussi des nouvelles séries, et face à un mecha ils se mettent à l'abri et lui lancent leurs grenades.",
-        "x_en": "Bots use the new killstreaks too, and against a mecha they take cover and throw their grenades at it."
+        "x_en": "Bots use the new killstreaks too, and against a mecha they take cover and throw their grenades at it.",
+        "x_vi": "Bot cũng dùng các chuỗi hạ gục mới, và khi đối đầu mecha chúng sẽ tìm chỗ nấp và ném lựu đạn vào nó."
       }
     ]
   },
@@ -297,17 +345,20 @@
       {
         "t": "improved",
         "x": "Les apparitions ont été revues. Vous ne réapparaissez plus sous les yeux d'un adversaire, ni près d'un combat ou d'une grenade. Si l'équipe adverse campe votre base, vous réapparaissez ailleurs sur la carte.",
-        "x_en": "Respawns have been reworked. You no longer respawn in an enemy's sight, or next to a fight or a grenade. If the other team camps your base, you respawn somewhere else on the map."
+        "x_en": "Respawns have been reworked. You no longer respawn in an enemy's sight, or next to a fight or a grenade. If the other team camps your base, you respawn somewhere else on the map.",
+        "x_vi": "Hồi sinh đã được làm lại. Bạn không còn hồi sinh ngay trước mắt đối thủ, hay cạnh một cuộc giao tranh hoặc một quả lựu đạn. Nếu đội đối phương cắm chốt ở căn cứ của bạn, bạn sẽ hồi sinh ở nơi khác trên bản đồ."
       },
       {
         "t": "improved",
         "x": "Au début d'une partie, chaque joueur a sa propre place. Deux coéquipiers n'apparaissent plus au même endroit.",
-        "x_en": "At the start of a match, every player has their own spot. Two teammates no longer appear in the same place."
+        "x_en": "At the start of a match, every player has their own spot. Two teammates no longer appear in the same place.",
+        "x_vi": "Đầu mỗi trận, mỗi người chơi có vị trí riêng. Hai đồng đội không còn xuất hiện ở cùng một chỗ."
       },
       {
         "t": "improved",
         "x": "En match à mort par équipe, vous êtes protégé deux secondes à votre réapparition, comme dans les autres modes. Tirer met fin à la protection.",
-        "x_en": "In Team deathmatch, you are protected for two seconds after you respawn, like in the other modes. Firing ends the protection."
+        "x_en": "In Team deathmatch, you are protected for two seconds after you respawn, like in the other modes. Firing ends the protection.",
+        "x_vi": "Ở chế độ Đấu đội tử chiến, bạn được bảo vệ hai giây sau khi hồi sinh, như các chế độ khác. Bắn sẽ kết thúc sự bảo vệ."
       }
     ]
   },

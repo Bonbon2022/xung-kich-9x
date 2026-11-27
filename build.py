@@ -219,10 +219,13 @@ for i,e in enumerate(log):
     major=bool(re.fullmatch(r"\d+\.0\.0",e["version"]))
     if major and not str(e.get("title","")).strip(): raise SystemExit(f"changelog.json : titre manquant pour la grande version {e['version']}")
     if str(e.get("title","")).strip() and not str(e.get("title_en","")).strip(): raise SystemExit(f"changelog.json : titre anglais (title_en) manquant pour {e['version']}")
+    # fork vietnamien : le vietnamien n'est exigé que pour les 10 entrées les plus récentes (celles affichées, voir NEWS_MAX dans src/09f-news.js)
+    if i<10 and str(e.get("title","")).strip() and not str(e.get("title_vi","")).strip(): raise SystemExit(f"changelog.json : titre vietnamien (title_vi) manquant pour {e['version']}")
     if not e.get("changes"): raise SystemExit(f"changelog.json : aucun changement pour {e['version']}")
     for c in e["changes"]:
         if c.get("t") not in ("new","improved","fixed") or not str(c.get("x","")).strip(): raise SystemExit(f"changelog.json : changement invalide pour {e['version']} (t : new, improved ou fixed)")
         if not str(c.get("x_en","")).strip(): raise SystemExit(f"changelog.json : texte anglais (x_en) manquant pour {e['version']}")
+        if i<10 and not str(c.get("x_vi","")).strip(): raise SystemExit(f"changelog.json : texte vietnamien (x_vi) manquant pour {e['version']}")
     if i and vkey(log[i-1]["version"])<=vkey(e["version"]): raise SystemExit(f"changelog.json : versions à ranger de la plus récente à la plus ancienne ({e['version']})")
 html=html.replace("__CHANGELOG__",json.dumps(log,ensure_ascii=False,separators=(",",":")).replace("<","\\u003c"))
 print("version :",log[0]["version"])
