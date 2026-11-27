@@ -263,7 +263,52 @@ Theo yêu cầu người chơi (duyệt bởi user): ở màn Solo, chọn trự
 - **Không đụng:** khóa ô lớp tùy biến theo cấp người chơi (`CUSTOM_UNLOCK`), khóa phụ kiện/camo theo
   cấp súng, và hành vi `soloGun` (solo vẫn luôn mở toàn bộ như mục 8).
 
-## 9. Cách build lại
+## 9. Cải thiện cho máy yếu — Phase 1: phân loại lại iGPU 2015–2020 + gợi ý tiết kiệm trên desktop (2026-11-27)
+
+Theo kế hoạch `KE-HOACH-CAI-THIEN-MAY-YEU.md` (Phase 1). Mục tiêu của user: game chạy được trên **nhiều máy
+nhất có thể** — thà xuất phát hơi thấp rồi leo lên còn hơn xuất phát quá nặng. **Hoàn thành ở local, chưa
+commit/push.**
+
+- **Bối cảnh lỗi:** `GPU_WEAK` (`src/01-core.js`) chỉ nhận iGPU Intel đời 2010–2012, nên HD 520/620, UHD
+  620/630… (máy trường học/văn phòng 2015–2020) rơi vào tier xuất phát **medium**: MSAA 4×, POM bật, shadow
+  1536 × 3 cascade — quá nặng cho iGPU chia sẻ băng thông với CPU.
+- **Quyết định thiết kế (quan trọng): KHÔNG nhét các chip này vào `GPU_WEAK`.** Trong code này `GPU_WEAK`
+  đồng nghĩa « khởi động ở Minimale » qua `ultraAtBoot()` — tắt bóng tính toán, không pre-pass, texture còn
+  1/3, và phải tải lại trang mới thoát được. Quá tay cho HD 620/UHD 620. Thay vào đó tạo nhóm riêng
+  **`GPU_IGPU`** ngay sau `GPU_WEAK` trong `src/01-core.js`: HD Graphics 515/520/530/620, UHD Graphics
+  610/620/630 + UHD không số (Ice Lake G1), Iris Graphics 5100/6100, Iris Plus Graphics 640/650/655 + Iris
+  Plus không số (Ice Lake G4/G7). Regex cố ý hẹp: **không** bắt Iris Pro, Iris Xe, UHD 7xx, GPU rời,
+  Apple M, Adreno/Mali đời mới.
+- **Tier xuất phát:** ánh xạ `GPU.tier` (IIFE `GPU`, `src/01-core.js`): khi quality = auto, nhóm `GPU_IGPU`
+  xuất phát ở **`medium2`** thay vì `medium`. Đã xác nhận `medium2` có thật trong `QUALITY` và nhẹ hơn thật:
+  MSAA 2× (vs 4×), `pom: [0,0,1,0]` = tắt hẳn (vs bật `[8,6,10,0.85]`), đèn chớp sáng 3 (vs 4), `scaleMin`
+  0,65; shadow giữ 1536 như medium. Không đổi: tier cố định do người dùng chọn, GPU rời → high, `GPU_SOFT`
+  → ultra từ khởi động, cảm ứng → low. Lưu ý đúng code: `AUTO_LADDER` giữ nguyên và `rungMin` là trần leo
+  của mode auto (thang không tự đổi profile cao hơn profile xuất phát) — xuất phát medium2 được bù bằng
+  độ phân giải động leo tới mật độ màn hình ngay trong rung xuất phát, không tự nhảy lên profile medium.
+- **Gợi ý eco cho desktop yếu (`src/09zl-economie.js`):** hộp thoại Économie d'énergie trước đây chỉ hiện
+  ở thiết bị cảm ứng (vì `Settings.ecoAsk` chỉ được đặt = `COARSE` ở `src/01-core.js`). Nay `ecoAsk()` tự
+  « thăng » `ecoAsk` khi: không phải cảm ứng (`!COARSE`), máy yếu (`GPU_WEAK || GPU_SOFT || GPU_IGPU`) và
+  chưa từng được hỏi (`!Settings.ecoWeakAsked` — cờ mới thêm vào literal `Settings` ở `src/01-core.js`).
+  `ecoClose()` đặt `ecoWeakAsked = true` + lưu qua `saveSettings()` như mọi cài đặt khác: đã trả lời (kể cả
+  từ chối) thì không bao giờ hỏi lại; đóng trang trước khi trả lời thì lần sau hỏi tiếp (như hành vi cảm ứng).
+  Tái dùng **nguyên** hộp thoại và chuỗi sẵn có trong `shell.html` — không thêm khóa i18n nào.
+- **Kiểm chứng:** `python3 build.py` sạch (chỉ còn cảnh báo placeholder pháp lý `09k-legal.js` có từ trước);
+  `tools/dev/check_i18n.py` **0 lỗi, 1.618/1.618**. Headless Chromium (bản build local, ghi đè chuỗi renderer
+  WebGL bằng init script chặn `getParameter(37445/37446/7937)` để **chính code thật của game tự phân loại**):
+  **121/121 PASS** — 19 chuỗi mẫu: HD 520/530/620, UHD 610/620/630, UHD không số, Iris 6100, Iris Plus
+  640/655/không số → `GPU_IGPU=true`, tier `medium2`; GTX 1650, RX 580 → `high`; SwiftShader →
+  `GPU_SOFT=true`, tier `ultra`; Apple M1 → `medium`; Iris Xe, UHD 770, Iris Pro 6200 → **không** bị bắt,
+  tier `medium`; HD 4000 → `GPU_WEAK=true`, tier `ultra` (hành vi cũ giữ nguyên). Hồ sơ sạch không ghi đè:
+  Settings mặc định không đổi (`quality 'auto'`, `eco false`, `ecoWeakAsked false`, `soloGun null`,
+  `unlockAll false`), không lỗi JS. Luồng eco trọn vòng trên desktop giả lập UHD 620: vào được menu chính →
+  hộp thoại hiện → bấm « Non merci » → `ecoWeakAsked=true` đã lưu trong `dc_settings` → tải lại trang → gọi
+  `ecoAsk()` cũng không hiện nữa.
+- **Chưa kiểm chứng:** FPS thật trên phần cứng UHD 620 (đó là Phase 0 của kế hoạch — cần máy thật của user).
+  Trường hợp hiếm: người dùng đã tự bật/tắt eco trong Options trước khi từng thấy hộp thoại vẫn có thể bị
+  hỏi một lần — chấp nhận được.
+
+## 10. Cách build lại
 
 ```bash
 python3 build.py   # sinh dist/riposte-frontline.html, đã nhúng cả I18N_EN và I18N_VI

@@ -43,7 +43,7 @@ function deckLooksLike() {
 /* Écran tactile comme pointeur principal (téléphone, tablette) : contrôles tactiles (09q-tactile.js) et profil graphique de départ allégé */
 const COARSE = !DECK && typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches && (navigator.maxTouchPoints || 0) > 0;
 const VIEW = { w: innerWidth, h: innerHeight, set: false }; // taille de la vue 3D (viewSync)
-const Settings = { binds: {}, touch: 'auto', tcRun: 'stick', tcStick: 'float', tcLay: null, aimAssist: 'normal', tpMode: 'auto', tpSeen: false, tpHint: false, tpAuto: true, tpDblAds: true, adsToggle: false, tcAuto: true, tcDblAds: true, tcQuick: true, tcVib: true, tcAlpha: '1', tcV: 0, gfxSafe: false, gfxSafeAuto: '', padSeen: false, padSens: 1.0, padAdsMul: 0.65, adsMul: 1.0, padDead: 0.1, padCurve: 'reactive', padAccel: 'normal', padRun: 'click', padLay: 'default', padVib: true, sens: 1.0, fov: 62, quality: 'auto', dynres: true, eco: null, fpsMax: '0', perf: false, ao: false, rays: true, grass: true, difficulty: 2, loadout: 0, soloGun: null, unlockAll: false, mode: 'tdm', limit: 75, limitFfa: 20, limitDom: 150, minutes: 10, map: 'sable', volume: 0.8, music: 0.5, voice: true, nadeArc: true, invertY: false, fsGame: false, allyMarks: true, hudScale: '1', skin: 'assault', lang: 'auto', sv: 8 };
+const Settings = { binds: {}, touch: 'auto', tcRun: 'stick', tcStick: 'float', tcLay: null, aimAssist: 'normal', tpMode: 'auto', tpSeen: false, tpHint: false, tpAuto: true, tpDblAds: true, adsToggle: false, tcAuto: true, tcDblAds: true, tcQuick: true, tcVib: true, tcAlpha: '1', tcV: 0, gfxSafe: false, gfxSafeAuto: '', padSeen: false, padSens: 1.0, padAdsMul: 0.65, adsMul: 1.0, padDead: 0.1, padCurve: 'reactive', padAccel: 'normal', padRun: 'click', padLay: 'default', padVib: true, sens: 1.0, fov: 62, quality: 'auto', dynres: true, eco: null, ecoWeakAsked: false, fpsMax: '0', perf: false, ao: false, rays: true, grass: true, difficulty: 2, loadout: 0, soloGun: null, unlockAll: false, mode: 'tdm', limit: 75, limitFfa: 20, limitDom: 150, minutes: 10, map: 'sable', volume: 0.8, music: 0.5, voice: true, nadeArc: true, invertY: false, fsGame: false, allyMarks: true, hudScale: '1', skin: 'assault', lang: 'auto', sv: 8 };
 try {
   const s = JSON.parse(localStorage.getItem('dc_settings') || 'null');
   // réglages d'avant la version 2 : la qualité « Haute » y était la valeur par défaut, on passe en automatique
@@ -69,7 +69,8 @@ try {
    Les verrous hors armes (emplacements de classes personnalisées, séries) ne sont pas concernés. */
 if (UNLOCKALL_URL !== null && Settings.unlockAll !== UNLOCKALL_URL) { Settings.unlockAll = UNLOCKALL_URL; saveSettings(); }
 /* Économie d'énergie (CAP, plus bas) : jamais choisie, elle part activée au doigt (téléphone, tablette) et le jeu demande une fois s'il faut la garder
-   (ecoAsk, 09zl-economie.js) ; ailleurs, désactivée sans question */
+   (ecoAsk, 09zl-economie.js) ; sur un bureau à puce faible (GPU_WEAK, GPU_SOFT ou GPU_IGPU), la question est aussi posée une fois, mais pour
+   l'activer (voir ecoAsk, 09zl-economie.js, et le marqueur ecoWeakAsked) ; ailleurs, désactivée sans question */
 if (Settings.eco !== true && Settings.eco !== false) { Settings.eco = COARSE; Settings.ecoAsk = COARSE; }
 /* Sous l'économie d'énergie, c'est le jeu qui règle l'image (Options, Vidéo : les rangées sont grisées et montrent ces valeurs). Qualité
    automatique : elle part du profil de l'appareil (téléphone : Basse, puce intégrée : Moyenne, carte dédiée : Haute) et la résolution
@@ -260,6 +261,14 @@ const GPU_NAME = (() => { try { const gl = renderer.getContext(), x = gl.getExte
    Mali-400, PowerVR SGX. Le mode automatique y part du profil Minimale. */
 const GPU_SOFT = /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(GPU_NAME);
 const GPU_WEAK = /\bGMA\b|Mobile Intel|Sandybridge|Ivybridge|Ironlake|Bay ?Trail|Intel(?:\(R\))? HD Graphics(?: (?:2000|2500|3000|4000|400|405|500|505|Family)\b| (?!\d)|,|\)|$)|Adreno \(TM\) [34]\d\d|Mali-T\d|Mali-4\d\d|PowerVR SGX/i.test(GPU_NAME);
+/* Puces intégrées Intel de 2015 à 2020 (machines d'école et de bureau) : trop faibles pour le profil Moyenne tel quel
+   (anticrénelage 4x et relief par parallaxe coûtent trop de bande passante partagée avec le processeur), mais bien
+   assez fortes pour ne pas relever de GPU_WEAK (Minimale, sans ombres calculées, se décide au lancement et ne se
+   quitte qu'en relançant). En mode automatique, elles partent donc un cran plus bas, en Moyenne allégée (medium2 :
+   anticrénelage 2x, pas de relief), et la résolution dynamique ajuste ensuite. Volontairement étroit : HD 515/520/
+   530/620, UHD 610/620/630 et UHD sans numéro (Ice Lake G1), Iris 5100/6100, Iris Plus 640/650/655 et Iris Plus
+   sans numéro (Ice Lake G4/G7) ; ni Iris Pro, ni Iris Xe, ni UHD 7xx, ni aucune carte dédiée. */
+const GPU_IGPU = /Intel(?:\(R\))? (?:HD Graphics (?:515|520|530|620)\b|UHD Graphics(?: (?:610|620|630)\b| (?!\d)|,|\)|$)|Iris(?:\(R\)|\(TM\))? (?:Graphics (?:5100|6100)\b|Plus Graphics(?: (?:640|650|655)\b| (?!\d)|,|\)|$)))/i.test(GPU_NAME);
 /* Profil Minimale en vigueur au lancement (choisi, ou mode automatique sur une puce de GPU_WEAK ou en rendu logiciel) : ce qui ne se change qu'en
    recompilant tous les shaders se décide ici, une fois (ombres calculées coupées, pas de pré-passe, pas de gazon, tissus simulés comme sur téléphone).
    Le reste du profil (QUALITY.ultra) s'applique à chaud ; choisir ou quitter Minimale dans les Options propose de relancer le jeu (qualityBootCheck). */
@@ -311,13 +320,14 @@ const QUALITY = {
    sa résolution (1 à scaleMin). Changer de résolution ne recrée rien (RS) ; changer de profil recrée les cibles. */
 const AUTO_LADDER = [['high', 0.8, 1], ['medium', 1, 1], ['medium2', 0.7, 1], ['low', 0.7, 1], ['ultra', 0.5, 0.7]];
 /* Profil de départ en mode automatique : carte graphique dédiée → Haute, puce intégrée (Intel Iris/UHD,
-   Radeon intégrées, Apple M) → Moyenne, téléphone → Basse, rendu logiciel et puce trop faible (GPU_WEAK) → Minimale.
+   Radeon intégrées, Apple M) → Moyenne — sauf les puces intégrées 2015-2020 de GPU_IGPU → Moyenne allégée —,
+   téléphone → Basse, rendu logiciel et puce trop faible (GPU_WEAK) → Minimale.
    La résolution dynamique fait le reste. */
 const GPU = (() => {
   const gl = renderer.getContext(); let name = '';
   try { const ext = gl.getExtension('WEBGL_debug_renderer_info'); name = String(gl.getParameter(ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER) || ''); } catch (e) { /* inconnu */ }
   const discrete = /NVIDIA|GeForce|Quadro|RTX|GTX|Radeon RX|Radeon Pro|Radeon\(TM\) RX|FirePro|Arc\(TM\) A\d|Arc A\d/i.test(name);
-  return { name, tier: ULTRA ? 'ultra' : COARSE ? 'low' : discrete ? 'high' : 'medium' }; // téléphone : on part du plus léger, la résolution dynamique remonte si la puce suit
+  return { name, tier: ULTRA ? 'ultra' : COARSE ? 'low' : discrete ? 'high' : GPU_IGPU ? 'medium2' : 'medium' }; // téléphone : on part du plus léger, la résolution dynamique remonte si la puce suit
 })();
 /* État courant : profil retenu, facteur de résolution dynamique. En mode automatique : échelon de AUTO_LADDER (rung)
    et échelon de départ (rungMin), où la résolution va de la plage du profil jusqu'à la densité de l'écran (voir stepQuality). */
