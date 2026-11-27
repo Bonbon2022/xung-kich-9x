@@ -23,6 +23,7 @@ Cho phép nhúng được khai báo ở `vercel.json`: header `Content-Security-
 | Param | Bắt buộc | Ý nghĩa |
 |---|---|---|
 | `xk9x=1` | Có | Bật cầu nối. Thiếu param này, game chạy hoàn toàn như bình thường, không đọc các param còn lại (trừ `salon` vốn có từ trước). |
+| `lang` | Không | Ngôn ngữ cho phiên chơi này: `vi`, `en` hoặc `fr`. Tham số URL thắng mọi thứ khác (kể cả lựa chọn đã lưu trong `dc_settings`) nhưng chỉ trong phiên, không ghi lại vào `dc_settings`. Khi có `xk9x=1` mà không có `lang`, mặc định là `vi` — vì người vào từ Sân Chơi từng bị kẹt tiếng Anh do `dc_settings` cũ trên origin của game đã lưu `lang: 'en'`. Phía Sân Chơi hiện gửi kèm `lang=vi` tường minh. |
 | `nick` | Không | Nick của người chơi bên Sân Chơi. Game ghi đè `localStorage 'cod_nick'` bằng nick này (qua `netClean` như mọi nick khác: bỏ ký tự điều khiển/chevron, tối đa 16 ký tự, lọc tên) trước khi khởi tạo mạng, nên nick trong phòng chơi là nick Sân Chơi. |
 | `creer=<MÃ>` | Một trong hai | Vai **chủ phòng**: game tự tạo phòng với đúng mã này (5 ký tự, viết hoa, chỉ gồm A–Z/0–9) ngay khi sẵn sàng, rồi mở màn hình Nhiều người chơi. |
 | `salon=<MÃ>` | Một trong hai | Vai **khách**: dùng nguyên cơ chế link mời sẵn có của game (tự vào phòng theo mã). Nếu có cả `salon` lẫn `creer`, `salon` được ưu tiên như hành vi gốc. |

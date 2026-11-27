@@ -16,6 +16,11 @@ const LANG_PREF = (() => {
   return 'auto';
 })();
 const LANG = (() => {
+  // Cầu nối Sân Chơi 9X : le paramètre d'URL prime pour la session — ?lang=vi|en|fr explicite,
+  // ou ?xk9x=1 (entrée depuis Sân Chơi) qui impose le vietnamien par défaut, même si un ancien
+  // dc_settings avait figé l'anglais. Rien n'est écrit dans dc_settings : hors cầu nối, le choix
+  // enregistré et la détection automatique ci-dessous s'appliquent comme avant.
+  try { const q = new URLSearchParams(location.search), l = q.get('lang'); if (l === 'en' || l === 'fr' || l === 'vi') return l; if (q.get('xk9x')) return 'vi'; } catch (e) { /* ignoré */ }
   if (LANG_PREF !== 'auto') return LANG_PREF;
   const l = (typeof navigator !== 'undefined' && (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language])) || [];
   for (const x of l) { const c = String(x || '').slice(0, 2).toLowerCase(); if (c === 'fr' || c === 'en' || c === 'vi') return c; }
