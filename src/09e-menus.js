@@ -130,7 +130,7 @@ function pickClass(i) {
 }
 /* Sous-titre du menu Classes : niveau du joueur et prochain emplacement personnalisé */
 function classesHeader() {
-  const lvl = playerLevel(), next = CUSTOM_UNLOCK.find((v) => v > lvl), n = CUSTOM_UNLOCK.filter((v) => v <= lvl).length;
+  const lvl = playerLevel(), next = Settings.unlockAll ? undefined : CUSTOM_UNLOCK.find((v) => v > lvl), n = Settings.unlockAll ? CUSTOM_MAX : CUSTOM_UNLOCK.filter((v) => v <= lvl).length;
   $('clsSub').textContent = `${_tn(n, 'Niveau {1} : {0} emplacement de classe personnalisée sur {2}', 'Niveau {1} : {0} emplacements de classe personnalisée sur {2}', lvl, CUSTOM_MAX)}` + (next ? `${_t(', le suivant au niveau {0}.', next)}` : _t(', tous débloqués.'));
   if (ACCT.state === 'ready' && !ACCT.user) $('clsSub').textContent += ' ' + _t('Non connecté. Votre progression reste sur cet appareil.'); // la copie sur le compte (06r-arsenal.js) suppose d'être connecté
 }
@@ -148,7 +148,7 @@ function renderPicker(P) {
     group = g;
     const sl = c.custom ? `aria-selected="${i === view}"` : `aria-selected="${i === view}"`;
     if (c.custom && !c.made) {
-      const lock = lvl < CUSTOM_UNLOCK[c.slot];
+      const lock = !customUnlocked(c.slot);
       html += `<button type="button" class="cls ${lock ? 'lock' : 'free'}" role="option" data-i="${i}" ${sl}><span class="cn">${lock ? _t('Verrouillée') : _t('+ Créer une classe')}</span><span class="cw">${lock ? _t('Niveau {0} requis', CUSTOM_UNLOCK[c.slot]) : _t('Emplacement {0}', c.slot + 1)}</span></button>`;
       continue;
     }
@@ -165,7 +165,7 @@ function classDetailHtml(P, v) {
   const c = CLASSES[v], lvl = playerLevel();
   if (c.custom && !c.made) {
     const n = c.slot, need = CUSTOM_UNLOCK[n];
-    if (lvl < need) {
+    if (!customUnlocked(n)) {
       const prev = n ? CUSTOM_UNLOCK[n - 1] : 1, pct = clamp((lvl - 1) / (need - 1), 0, 1);
       return `<div class="cp-lock"><p class="wtype">${_t('Emplacement personnalisé {0}', n + 1)}</p><b>${_t('Niveau {0} requis', need)}</b><p class="cdesc">${_t('Montez de niveau en jouant pour débloquer cet emplacement. Vous y composerez votre propre classe (armes, accessoires, camouflages) et vous pourrez la renommer.')}</p><div class="bar"><i style="width:${(pct * 100).toFixed(0)}%"></i></div><p class="hint">${_t('Votre niveau : {0}{1}', lvl, ACCT.user ? '' : ' ' + _t('(sur cet appareil, connectez-vous pour suivre le niveau de votre compte)'))}</p></div>`;
     }

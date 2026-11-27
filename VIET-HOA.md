@@ -260,8 +260,14 @@ Theo yêu cầu người chơi (duyệt bởi user): ở màn Solo, chọn trự
   giữ trạng thái cho tới khi nhận `unlockall=0`. `weaponLock()` trong `src/06r-arsenal.js` trả về
   « không khóa » cho mọi súng khi công tắc bật, nên kho vũ khí, màn sửa lớp và kiểm tra trang bị đều mở
   hết theo cùng một cổng duy nhất.
-- **Không đụng:** khóa ô lớp tùy biến theo cấp người chơi (`CUSTOM_UNLOCK`), khóa phụ kiện/camo theo
+- **Không đụng (bản đầu):** khóa ô lớp tùy biến theo cấp người chơi (`CUSTOM_UNLOCK`), khóa phụ kiện/camo theo
   cấp súng, và hành vi `soloGun` (solo vẫn luôn mở toàn bộ như mục 8).
+- **Mở rộng 2026-11-27 (user duyệt):** `unlockall` nay mở **luôn cả 5 ô lớp tùy biến** — `customUnlocked()`
+  trong `src/06r-arsenal.js` trả về true khi công tắc bật, và UI lớp (`classesHeader`, danh sách ô, panel
+  chi tiết trong `src/09e-menus.js`) đi qua cùng cổng này nên hiện « 5/5, tous débloqués » và nút Tạo lớp
+  ngay ở cấp 1. Tắt bằng `?unlockall=0` thì các ô **chưa tạo** khóa lại theo cấp như cũ; lớp đã tạo trong
+  lúc bật vẫn còn dữ liệu nhưng không chọn được cho tới khi đủ cấp hoặc bật lại. Khóa phụ kiện/camo theo
+  cấp súng (`attLock`/`camoLock`) vẫn giữ nguyên — ô mở nhưng phụ kiện/camo vẫn phải cày cấp súng.
 
 ## 9. Cải thiện cho máy yếu — Phase 1: phân loại lại iGPU 2015–2020 + gợi ý tiết kiệm trên desktop (2026-11-27)
 

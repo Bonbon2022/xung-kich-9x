@@ -160,7 +160,7 @@ for (let n = 0; n < CUSTOM_MAX; n++) {
   CLASSES.push({ name: _t('Classe {0}', n + 1), desc: _t('Une classe de votre composition, avec armes, accessoires et camouflages.'), primary: 'm4', secondary: 'm9', nades: NADE_COUNT, nade: 'frag',
     pa: [], sa: [], pc: null, sc: null, ks: KS_DEFAULT.slice(), def: { primary: 'm4', secondary: 'm9' }, custom: true, slot: n, made: false });
 }
-const customUnlocked = (n) => playerLevel() >= CUSTOM_UNLOCK[n];
+const customUnlocked = (n) => Settings.unlockAll || playerLevel() >= CUSTOM_UNLOCK[n]; // unlockall (?unlockall=1) : les 5 emplacements personnalisés sont ouverts aussi, sans niveau requis
 /* Une classe se choisit si elle est préconçue, ou personnalisée, créée et débloquée */
 const classAvail = (i) => { const c = CLASSES[i]; return !!c && (!c.custom || (c.made && customUnlocked(c.slot))); };
 const classIds = () => CLASSES.map((c, i) => i).filter(classAvail);
